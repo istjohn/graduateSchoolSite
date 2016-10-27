@@ -1,0 +1,13 @@
+.headerRow {
+    display:table-row;
+    text-align:center;
+    font-size:12pt;
+    text-underline:single;
+    border:solid 1px black;
+}
+
+#schoolTable {
+    display:table;
+    border: solid 1px black;
+
+}
