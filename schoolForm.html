@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <script src="jquery.js"></script>
-    <script src="context.js"></script>
+    <script src="gradSchoolsContext.js"></script>
     <script src="formScript.js"></script>
+    <link rel="stylesheet" type="text/css" href="form.css">
     <title>Graduate School Candidate Form</title>
 </head>
 <body>
@@ -12,15 +13,58 @@
         <fieldset>
             <legend>School Information</legend>
             <label for="schoolName">School Name:</label>
-            <input id="schoolName" type="text" required>
-            <label for>State:</label>
+            <input id="schoolName" type="text" required><br>
+            <label for="schoolState">State:</label>
             <select id="schoolState" required>
-                <option id="ny"
-            </select>
+                <option id="ny">New York</option>
+                <option id="ma">Massachusetts</option>
+                <option id="ri">Rhode Island</option>
+                <option id="nc">North Carolina</option>
+            </select><br>
+            <label for="appDueDate">Application Due Date:</label>
+            <input id="appDueDate" type="date"><br>
+            <label for="appFee">Application Fee:</label>
+            <input id="appFee" type="text" datatype="double"><br>
         </fieldset>
-
+        <br><br>
         <fieldset>
             <legend>Program Information</legend>
+            <label for="degree">Degree:</label>
+            <select id="degree">
+                <option id="msw">MSW</option>
+                <option id="map"MAP>MAP</option>
+                <option id="mscp">MSCP</option>
+            </select>
+            <label for="creds">Credits to Complete:</label>
+            <input id="creds" type="text">
+            <label for="progLen">Program Length (in Years):</label>
+            <input id="progLen" type="text">
+            <label>Cost Type:</label>
+            <input name="costType" type="radio" value="costPerCred">Per Credit<br>
+            <input name="costType" type="radio" value="costPerSem">Per Semester<br>
+            <input name="costType" type="radio" value="costPerYear">Per Academic Year<br>
+            <input id="cost" type="text">
+            <fieldset>
+                <legend>Program Options (Specializations & Concentrations):</legend>
+                <label>Program Option Type:</label>
+                <input name="opType" type="radio" value="con">Concentration<br>
+                <input name="opType" type="radio" value="spec">Specialization<br>
+                <label for="opName">Program Option Name:</label>
+                <input id="opName" type="text">
+            </fieldset>
+            <fieldset>
+                <legend>Program Requirements for Acceptance</legend>
+                <label>Requirement Type:</label>
+                <input name="reqType" type="radio" value="docReq">Document Requirement<br>
+                <input name="reqType" type="radio" value="expReq">Experience Requirement<br>
+                <input name="reqType" type="radio" value="genReq">General Requirement<br>
+                <label for="req">Required Item:</label>
+                <select id="req">
+                    <option value="">Test Req</option>
+                </select>
+                <label for="reqParam">Requirement Parameter:</label>
+                <input id="reqParam" type="text">
+            </fieldset>
         </fieldset>
     </form>
 </body>

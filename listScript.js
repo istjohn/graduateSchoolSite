@@ -4,33 +4,24 @@
  */
 
 /**** GLOBAL VARIABLES, ACCESSIBLE TO THE WHOLE SCRIPT */
-var schoolForm = $("#schoolForm");
-var schoolTable = $("#schoolTable");
-var btnCancel = $("#btnCancel");
-var candidates = [];
 
 
-//This is the 'main()' method of this script
+//This is the 'main()' method of this script, and will only run when the page has fully loaded.
 $(document).ready(function() {
-    $(document).ondblclick(".editableRow",openEditDialog($(this)));
-
     if(typeof(Storage) == "undefined") {
         alert("There is no local storage available in this browser. Exiting");
         $(document).close();
-    } else if(localStorage.length > 0) {
-        alert("Length of the local storage:" + localStorage.length);
-        loadFromLocal();
-    } else {
-        var response = confirm("It looks like you haven't added anything yet. Would you like to?");
-        if(response == true) {
-            alert(response);
-            //open dialog here
-        }
     }
 
-    //Populate the table
-    populateTable();
+    $("#addNewSchool").click(function() {
+        alert("pressed da button, yo!");
+    });
 });
+
+function openFormPage() {
+    //$(window).open("schoolForm.html","Form","width=500,height=500");
+    $(window).open("http://stackoverflow.com/questions/2412001/select-table-row-in-jquery","new wind","width=500,height=500");
+}
 
 
 function populateTable() {
@@ -58,17 +49,6 @@ function saveToLocal() {
 
 }
 
-/** Open the form dialog with all empty data, to create an entirely new entry */
-function openCreateDialog() {
-    schoolForm.dialog({
-        title: "Dialog",
-        modal: true,
-        open: function () {
-            schoolForm.dialog("open");
-        }
-    });
-}
-
 /** Open the form dialog for an existing row in the grad school table, for editing or deletion */
 function openEditDialog(row) {
 
@@ -82,40 +62,4 @@ function fillTable() {
     for(var i = 0; i < length(schools); i++) {
 
     }
-}
-
-
-function GradSchool(schoolName, state, appDueDate, appFee, program) {
-    this.schoolName = schoolName;
-    this.state = state;
-    this.appDueDate = appDueDate;
-    this.appFee = appFee;
-    this.program = program;
-}
-
-function Program(degree, credits, length, cost, costType) {
-    this.degree = degree;
-    this.credits = credits;
-    this.cost = cost;
-    this.costType = costType;
-    calculateAllCosts(credits, length, cost, costType);
-}
-
-function ProgOp(type, opName) {
-    this.type = type;
-    this.opName = opName;
-}
-
-function ProgReq(reqType, req, reqParam) {
-    this.reqType;
-    this.req = req;
-    this.reqParam = reqParam;
-}
-
-function calculateAllCosts(creds, len, cost, costType) {
-
-}
-
-function selectRow() {
-    openEditDialog($())
 }
