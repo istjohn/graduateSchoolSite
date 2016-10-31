@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <script src="jquery.js"></script>
+    <script src="listAndFormScript.js"></script>
     <script src="gradSchoolsContext.js"></script>
-    <script src="formScript.js"></script>
     <link rel="stylesheet" type="text/css" href="form.css">
     <title>Graduate School Candidate Form</title>
 </head>
 <body>
-    <form id="schoolForm">
+    <form id="schoolForm" ACTION="listAndFormScript.js" METHOD="POST">
         <fieldset>
             <legend>School Information</legend>
             <label for="schoolName">School Name:</label>
@@ -66,6 +66,7 @@
                 <input id="reqParam" type="text">
             </fieldset>
         </fieldset>
+        <button id="btnSave" onclick="save">Save</button>
     </form>
 </body>
 </html>

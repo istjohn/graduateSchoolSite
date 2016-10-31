@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <script src="jquery.js"></script>
-    <script src="listScript.js"></script>
+    <script src="listAndFormScript.js"></script>
+    <script src="gradSchoolsContext.js"></script>
     <link rel="stylesheet" type="text/css" href="list.css">
     <title>Graduate School Candidate List</title>
 </head>
@@ -11,7 +12,7 @@
     <h1> Graduate School Candidates </h1>
     <hr>
     <table id="schoolTable">
-        <tr class="headerRow" ondblclick="displayMyIndex">
+        <tr class="headerRow">
             <td>School Name</td>
             <td>State</td>
             <td>Application Due Date</td>
@@ -19,13 +20,7 @@
             <td>Application File</td>
             <td>Program(s) of Interest</td>
         </tr>
-        <tr>
-            <button id="addNewSchool">Add New</button>
-        </tr>
-        <tr>
-
-        </tr>
     </table>
-    <button id="refreshTable">Refresh Graduate School Table </button>
+    <button id="addNewSchool">Add New School</button>
 </body>
 </html>
