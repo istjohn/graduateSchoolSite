@@ -15,11 +15,11 @@
             <input id="schoolName" type="text" required><br>
             <label for="schoolState">State:</label>
             <select id="schoolState" required>
-                <option id="ny">New York</option>
-                <option id="ma">Massachusetts</option>
-                <option id="ri">Rhode Island</option>
-                <option id="nc">North Carolina</option>
-                <option id="og">Oregon</option>
+                <option value="New York">New York</option>
+                <option value="Massachusetts">Massachusetts</option>
+                <option value="Rhode Island">Rhode Island</option>
+                <option value="North Carolina">North Carolina</option>
+                <option value="Oregon">Oregon</option>
             </select><br>
             <label for="appDueDate">Application Due Date:</label>
             <input id="appDueDate" type="date"><br>
@@ -31,19 +31,23 @@
             <legend>Program Information</legend>
             <label for="degree">Degree:</label>
             <select id="degree">
-                <option id="msw">MSW</option>
-                <option id="map"MAP>MAP</option>
-                <option id="mscp">MSCP</option>
+                <option value="MSW">MSW</option>
+                <option value="MAP"MAP>MAP</option>
+                <option value="MSCP">MSCP</option>
             </select>
             <label for="creds">Credits to Complete:</label>
             <input id="creds" type="number">
-            <label for="progLen">Program Length (in Years):</label>
+            <label for="progLen">Program Length (in years):</label>
             <input id="progLen" type="number">
-            <label>Cost Type:</label>
-            <input name="costType" type="radio" value="costPerCred">Per Credit<br>
-            <input name="costType" type="radio" value="costPerSem">Per Semester<br>
-            <input name="costType" type="radio" value="costPerYear">Per Academic Year<br>
-            <input id="cost" type="text">
+            <fieldset>
+                <legend>Program Cost</legend>
+                <i>Only 1 needs to be entered, the rest will be calculated.</i>
+                <div id="costDiv">
+                    <label for="costPerCred">Per Credit: </label><input id="costPerCred" type="number">
+                    <label for="costPerSem">Per Semester:</label><input id="costPerSem" type="number">
+                    <label for="costPerYear">Per Year:</label><input id="costPerYear" type="number">
+                </div>
+            </fieldset>
             <fieldset>
                 <legend>Program Options (Specializations & Concentrations):</legend>
                 <label>Program Option Type:</label>

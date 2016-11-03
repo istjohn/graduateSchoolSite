@@ -37,7 +37,16 @@ $(document).ready(function() {
     });
 
     //edit school
+    $('.editable').dblclick(function() {
+        var key = $(event.target).attr("id");
+        var candidate = candidates.get(key);
 
+        //show the form
+        $("#formFrame").hidden = false;
+
+        //tell the school to populate the visible form with its data
+        candidate.populateForm();
+    });
 
     //delete school
     $("#btnDelete").click(function() {
@@ -99,7 +108,7 @@ $(document).ready(function() {
 
         var progops = [];
 
-        var program = new Program($("#degree").val(), $("#progLen").val(), $("#creds").val(), costType, $("#cost"), , );
+        var program = new Program($("#degree").val(), $("#progLen").val(), $("#creds").val(), costType, $("#cost"));
 
         var school = {
             "schoolName":$("#schoolName").val(),
@@ -124,7 +133,7 @@ $(document).ready(function() {
         var progOps = prog.progOps;
         var progReqs = prog.progReqs;
 
-        var name = $("<td></td>").text(candidate.schoolName);
+        var name = $("<td class='editable'></td>").text(candidate.schoolName);
         var state = $("<td></td>").text(candidate.schoolState);
         var duedate = $("<td></td>").text(candidate.appDueDate);
         var fee = $("<td></td>").text("$"+candidate.appFee);
@@ -165,24 +174,30 @@ $(document).ready(function() {
         this.appDueDate = appDueDate;
         this.appFee = appFee;
         this.prog = prog;
+        this.populateSchoolFormData = function() {
+            $("#schoolName").val(this.schoolName);
+            $("#schoolState").val(this.schoolState);
+            $("#appDueDate").val(this.appDueDate);
+            $("#appFee").val(this.appFee);
+        }
     }
 
     /** Program constructor
      * params: type of degree, length of the program, credits required for completion, whether the entered cost is per credit,
      * per semester, or per academic year, and that individual cost (the rest will be calculated) the program options, and the
      * program requirements for acceptance*/
-    function Program(degree, progLen, creds, costType, cost, progOps, progReqs) {
+    function Program(degree, progLen, creds, progOps, progReqs) {
         this.degree = degree;
         this.progLen = progLen;
         this.creds = creds;
         this.costPerCred = 0.0;
         this.costPerSem = 0.0;
         this.costPerYear = 0.0;
-        calculateAllCosts(costType, cost);
         this.progOps = progOps;
         this.progReqs = progReqs;
 
-        function calculateAllCosts(costType, cost) {
+        /** Program functions */
+        this.calculateAllCosts = function(costType, cost) {
             //Always 2 semesters in any academic year
             var SPY = 2.0;
             var credsPerSem = this.creds / this.progLen;
@@ -204,6 +219,15 @@ $(document).ready(function() {
                     this.costPerSem = (this.costPerYear / SPY);
             }
         }
+
+        this.populateProgramFormData = function() {
+            $("#degree").val(this.degree);
+            $("#progLen").val(this.progLen);
+            $("#creds").val(this.creds);
+            $("#costPerCred").val(this.costPerCred);
+            $("#costPerSem").val(this.costPerSem);
+            $("#costPerYear").val(this.costPerYear);
+        }
     }
 
     /** Program Option constructor i.e: Specializations & Concentrations. Given the type and the name*/
@@ -217,5 +241,7 @@ $(document).ready(function() {
         this.reqGroup = reqGroup;
         this.reqType = reqType;
         this.reqParam = reqParam;
+
+        this.populate
     }
 });
