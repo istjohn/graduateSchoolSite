@@ -10,3 +10,11 @@
     display:table;
     border: solid 1px black;
 }
+
+.progOpsList {
+    float:left;
+}
+
+.progReqsList {
+    float:right;
+}

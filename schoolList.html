@@ -4,13 +4,15 @@
     <meta charset="UTF-8">
     <script src="jquery.js"></script>
     <script src="listAndFormScript.js"></script>
-    <script src="gradSchoolsContext.js"></script>
     <link rel="stylesheet" type="text/css" href="list.css">
     <title>Graduate School Candidate List</title>
 </head>
 <body>
     <h1> Graduate School Candidates </h1>
     <hr>
+    <details>
+        <dfn></dfn>
+    </details>
     <table id="schoolTable">
         <tr class="headerRow">
             <td>School Name</td>
@@ -21,6 +23,8 @@
             <td>Program(s) of Interest</td>
         </tr>
     </table>
-    <button id="addNewSchool">Add New School</button>
+    <iframe id="formFrame" src="schoolForm.html" hidden></iframe>
+    <button id="btnAddSchool">Add New School Candidate</button>
+    <button id="btnDeleteAll">Delete All School Candidates</button>
 </body>
 </html>
