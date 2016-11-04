@@ -2,10 +2,9 @@
  * Created by Iain on 10/26/2016.
  * Simple local web page for Danielle to track her candidate schools for graduate school
  */
-
 /**** GLOBAL VARIABLES, ACCESSIBLE TO THE WHOLE SCRIPT */
 /** the list of all the school objects stored in the pseudo db. */
-var candidates = [];
+//var candidates = [];
 
 //This is the 'main()' method of this script, and will only run when the page has fully loaded.
 $(document).ready(function() {
@@ -59,20 +58,23 @@ $(document).ready(function() {
                 )
             );
         });
+    } else {
+        alert("No school candidates have been added yet. Click on the 'Add New School' button below to add one.");
     }
     //attach handlers to the buttons on the list page
     //add new school
     $("#btnAddSchool").click(function() {
-        $("#formFrame").show();
+        $("#formFrame").css("visibility","visible");
+        //the form, in this case, should be empty
     });
 
     //edit school
     $('.editable').dblclick(function() {
-        var key = $(event.target).attr("id");
+        var key = $(event.target).text();
         var candidate = candidates.get(key);
 
         //show the form
-        $("#formFrame").show();
+        $("#formFrame").css("visibility","visible");
 
         //tell the school to populate the visible form with its data
         candidate.populateSchoolFormData();
@@ -113,8 +115,27 @@ $(document).ready(function() {
         orig.remove();
     });
 
-    //save
-    $("#btnSave").click(function() {
+    //update available req types based on selected req group
+    $(".reqGroup").onchange(function() {
+        var reqGroup = $(this).val();
+        if(reqGroup == "Document Requirement") {
+            $(".expreq").css("visibility","hidden");
+            $(".genreq").css("visibility","hidden");
+            $(".docreq").css("visibility","visible");
+        } else if(reqGroup == "Experience Requirement") {
+            $(".docreq").css("visibility","hidden");
+            $(".expreq").css("visibility","visible");
+            $(".genreq").css("visibility","hidden");
+        } else {
+            $(".docreq").css("visibility","hidden");
+            $(".expreq").css("visibility","hidden");
+            $(".genreq").css("visibility","visible");
+        }
+    });
+
+    //save/create -- performed whenever the save button is pressed, for a edited or new entry
+    $("#schoolForm").find("#btnSave").click(function() {
+        alert("attempting save");
         var ops = [];
         $("#schoolForm").find(".opSection").each(function() {
             var otype = $(this).children(".opType").val();
@@ -122,6 +143,7 @@ $(document).ready(function() {
             ops.push(new ProgOp(otype, oname));
         });
 
+        console.log("ops : " + ops.length);
 
         var reqs = [];
         $("#schoolForm").find(".reqSection").each(function() {
@@ -130,6 +152,9 @@ $(document).ready(function() {
             var p = $(this).children(".reqParam").val();
             reqs.push(new ProgReq(g, t, p));
         });
+
+        console.log("reqs : " + reqs.length);
+
         var key = $("#schoolName").val();
         var school = new School(
             key,
@@ -149,22 +174,21 @@ $(document).ready(function() {
         );
 
         localStorage.setItem(key, school);
-        var frame = $("#formFrame");
-        frame.hide();
+        $("#formFrame").css("visibility","hidden");
+        $(window).reload();
     });
 
     //cancel
     $("#btnCancel").click(function() {
-        var frame = $("#formFrame");
-        frame.hide();
+        $("#formFrame").css("visibility","hidden");
     });
 
     //delete
     $("#btnDelete").click(function() {
         var key = $("#schoolForm").find("#schoolName");
         localStorage.removeItem(key);
-        var frame = $("#formFrame");
-        frame.hide();
+        $("#formFrame").css("visibility","hidden");
+        $(window).reload();
     });
 
     /** GraduateSchool candidate object constructor
@@ -274,17 +298,17 @@ $(document).ready(function() {
             $("#reqType").val(this.reqType);
             $("#reqParam").val(this.reqParam);
             if(this.reqGroup == "Document Requirement") {
-                $(".expreq").hide();
-                $(".genreq").hide();
-                $(".docreq").show();
+                $(".expreq").css("visibility","hidden");
+                $(".genreq").css("visibility","hidden");
+                $(".docreq").css("visibility","visible");
             } else if(this.reqGroup == "Experience Requirement") {
-                $(".docreq").hide();
-                $(".expreq").show();
-                $(".genreq").hide();
+                $(".docreq").css("visibility","hidden");
+                $(".expreq").css("visibility","visible");
+                $(".genreq").css("visibility","hidden");
             } else {
-                $(".docreq").hide();
-                $(".expreq").hide();
-                $(".genreq").show();
+                $(".docreq").css("visibility","hidden");
+                $(".expreq").css("visibility","hidden");
+                $(".genreq").css("visibility","visible");
             }
         }
     }

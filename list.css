@@ -21,4 +21,7 @@
 
 #formFrame {
     visibility: hidden;
+    width:90%;
+    height:650px;
+    border:1px solid black;
 }
