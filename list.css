@@ -18,3 +18,7 @@
 .progReqsList {
     float:right;
 }
+
+#formFrame {
+    visibility: hidden;
+}

@@ -27,13 +27,43 @@ $(document).ready(function() {
     //populate the table if there are candidates to fill it
     if(candidates.length > 0) {
        $.each(candidates, function(ind, candidate) {
-            convertToTableEntry(candidate);
+           var prog = candidate.prog;
+           var ops = $("<ul class='progOpsList'>");
+           $.each(prog.progOps, function(ind, op) {
+               ops.append($("<li>").text(op.opType + " : " + op.opName));
+           });
+
+           var reqs = $("<ul class='progReqsList'>");
+           $.each(prog.progReqs, function(ind, req) {
+               reqs.append($("<li>").text("["+req.reqGroup+"] : "+req.reqParam + " " + req.reqType));
+           });
+
+            $("#schoolTable").append($("<tr>")
+                .append($("<td class='editable'>").text(candidate.schoolName))
+                .append($("<td>").text(candidate.schoolState))
+                .append($("<td>").text(candidate.appDueDate))
+                .append($("<td>").text(candidate.appFee))
+                .append($("<td>")
+                    .append($("<details>")
+                        .append($("<summary>").text(prog.degree))
+                        .append($("<p>"))
+                        .append($("<p>"))
+                        .append($("<p>").text("Costs:"))
+                        .append($("<p>").text("Per:(Credit, Semester, Year)"))
+                        .append($("<p>").text("("+prog.costPerCred+", "+prog.costPerSem+", "+prog.costPerYear+")"))
+                        .append($("<div>")
+                            .append(ops)
+                            .append(reqs)
+                        )
+                    )
+                )
+            );
         });
     }
     //attach handlers to the buttons on the list page
     //add new school
-    $("#addNewSchool").click(function() {
-        $("#formFrame").hidden = false;
+    $("#btnAddSchool").click(function() {
+        $("#formFrame").show();
     });
 
     //edit school
@@ -42,15 +72,10 @@ $(document).ready(function() {
         var candidate = candidates.get(key);
 
         //show the form
-        $("#formFrame").hidden = false;
+        $("#formFrame").show();
 
         //tell the school to populate the visible form with its data
-        candidate.populateForm();
-    });
-
-    //delete school
-    $("#btnDelete").click(function() {
-
+        candidate.populateSchoolFormData();
     });
 
     //delete ALL schools
@@ -65,106 +90,82 @@ $(document).ready(function() {
     //attach handlers to the form page
     //add requirement
     $("#btnAddReq").click(function() {
-        var nr = $("#numReqs").val();
-        $("#numReqs").val(nr + 1);
+        var orig = $("#schoolForm").find(".reqSection:last");
+        var clone = orig.clone();
+        orig.append(clone);
     });
 
     //remove requirement
     $("#btnRemoveReq").click(function() {
-
+        var orig = $("#schoolForm").find(".reqSection:last");
+        orig.remove();
     });
 
     //add op
-
+    $("#btnAddOp").click(function() {
+        var orig = $("#schoolForm").find(".opSection:last");
+        var clone = orig.clone();
+        orig.append(clone);
+    });
     //remove op
-
-    //check which values should be in the requirement type dropdown based on the selected requirement group.
-    //make the options with the correct class not hidden
-    $("#reqGroup").change(function() {
-        var selected = $("#reqGroup option:selected");
-        switch(selected) {
-            case "docReq":
-                $(".docreq").prop("hidden",false);
-                break;
-            case "expReq":
-                $(".expreq").prop("hidden",false);
-                break;
-            case "genReq":
-                $(".genreq").prop("hidden",false);
-                break;
-        }
+    $("#btnRemoveReq").click(function() {
+        var orig = $("#schoolForm").find(".opSection:last");
+        orig.remove();
     });
 
     //save
     $("#btnSave").click(function() {
-        var costType;
-        if($("input[name=costType][value=costPerCred]").prop('checked','checked')) {
-            costType = 'costPerCred';
-        } else if($("input[name=costType][value=costPerSem]").prop('checked','checked')) {
-            costType = 'costPerSem';
-        } else {
-            costType = 'costPerYear';
-        }
+        var ops = [];
+        $("#schoolForm").find(".opSection").each(function() {
+            var otype = $(this).children(".opType").val();
+            var oname = $(this).children(".opName").val();
+            ops.push(new ProgOp(otype, oname));
+        });
 
-        var progops = [];
 
-        var program = new Program($("#degree").val(), $("#progLen").val(), $("#creds").val(), costType, $("#cost"));
+        var reqs = [];
+        $("#schoolForm").find(".reqSection").each(function() {
+            var g = $(this).children(".reqGroup").val();
+            var t = $(this).children(".reqType").val();
+            var p = $(this).children(".reqParam").val();
+            reqs.push(new ProgReq(g, t, p));
+        });
+        var key = $("#schoolName").val();
+        var school = new School(
+            key,
+            $("#schoolState").val(),
+            $("#appDueDate").val(),
+            $("#appFee").val(),
+            new Program(
+                $("#degree").val(),
+                $("#progLen").val(),
+                $("#creds").val(),
+                $("#costPerCred").val(),
+                $("#costPerSem").val(),
+                $("#costPerYear").val(),
+                ops,
+                reqs
+            )
+        );
 
-        var school = {
-            "schoolName":$("#schoolName").val(),
-            "schoolState":$("#schoolState").val(),
-            "appDueDate":$("#appDueDate").val(),
-            "appFee":$("#appFee").val()
-        }
+        localStorage.setItem(key, school);
+        var frame = $("#formFrame");
+        frame.hide();
     });
 
     //cancel
     $("#btnCancel").click(function() {
-
+        var frame = $("#formFrame");
+        frame.hide();
     });
 
     //delete
     $("#btnDelete").click(function() {
-
+        var key = $("#schoolForm").find("#schoolName");
+        localStorage.removeItem(key);
+        var frame = $("#formFrame");
+        frame.hide();
     });
-
-    function convertToTableEntry(candidate) {
-        var prog = candidate.prog;
-        var progOps = prog.progOps;
-        var progReqs = prog.progReqs;
-
-        var name = $("<td class='editable'></td>").text(candidate.schoolName);
-        var state = $("<td></td>").text(candidate.schoolState);
-        var duedate = $("<td></td>").text(candidate.appDueDate);
-        var fee = $("<td></td>").text("$"+candidate.appFee);
-        var degree = $("<summary></summary>").text(prog.degree);
-        var proglen = $("<p></p>").text(prog.progLen);
-        var creds = $("<p></p>").text(prog.creds);
-        var costpercred = $("<p></p>").text(prog.costPerCred);
-        var costpersem = $("<p></p>").text(prog.costPerSem);
-        var costperyear = $("<p></p>").text(prog.costPerYear);
-        var opliststr = "";
-        $.each(progOps, function(ind, op) {
-            opliststr += $("<li></li>").text(op.opType + " : " + op.opName);
-        });
-        var progoplist = $("<ul class='progOpList'></ul>").html(opliststr);
-
-        var reqliststr = "";
-        $.each(progReqs, function(ind, req) {
-            opliststr += $("<li></li>").text(req.reqGroup + " : " + req.reqParam + " " + req.reqType);
-        });
-        var progreqlist = $("<ul class='progReqList'></ul>").html(reqliststr);
-
-        var opreqdiv = $("<div class='opsAndReqs'></div>").html(progoplist + progreqlist);
-
-        var progDetails = $("<details></details>").html(degree + proglen + creds + costpercred + costpersem +
-            costperyear + opreqdiv);
-
-        var row = $("<tr></tr>").html(name + state + duedate + fee + progDetails);
-
-        $("#schoolTable").appendChild(row);
-    }
-
 
     /** GraduateSchool candidate object constructor
      * params: school's name, state it's in, application due date and fee, and the program of interest*/
@@ -179,6 +180,7 @@ $(document).ready(function() {
             $("#schoolState").val(this.schoolState);
             $("#appDueDate").val(this.appDueDate);
             $("#appFee").val(this.appFee);
+            this.prog.populateProgramFormData();
         }
     }
 
@@ -186,13 +188,26 @@ $(document).ready(function() {
      * params: type of degree, length of the program, credits required for completion, whether the entered cost is per credit,
      * per semester, or per academic year, and that individual cost (the rest will be calculated) the program options, and the
      * program requirements for acceptance*/
-    function Program(degree, progLen, creds, progOps, progReqs) {
+    function Program(degree, progLen, creds, cpc, cps, cpy, progOps, progReqs) {
         this.degree = degree;
         this.progLen = progLen;
         this.creds = creds;
         this.costPerCred = 0.0;
         this.costPerSem = 0.0;
         this.costPerYear = 0.0;
+
+        //Check which, if any, of the costs are still 0.
+        if(cpc && (!cps && !cpy)) {
+            this.calculateAllCosts("costPerCred",cpc);
+        } else if(cps && (!cpc && !cpy)) {
+            this.calculateAllCosts("costPerSem",cps);
+        } else if(cpy && (!cpc && !cps)) {
+            this.calculateAllCosts("costPerYear", cpy);
+        } else {
+            this.costPerCred = cpc;
+            this.costPerSem = cps;
+            this.costPerYear = cpy;
+        }
         this.progOps = progOps;
         this.progReqs = progReqs;
 
@@ -202,24 +217,20 @@ $(document).ready(function() {
             var SPY = 2.0;
             var credsPerSem = this.creds / this.progLen;
 
-            switch(costType) {
-                case "costPerCred":
-                    this.costPerCred = cost;
-                    this.costPerYear = (this.costPerCred * this.creds);
-                    this.costPerSem = this.costPerYear / SPY;
-                    break;
-                case "costPerSem":
-                    this.costPerSem = cost;
-                    this.costPerCred = this.costPerSem / credsPerSem;
-                    this.costPerYear = this.costPerSem * (this.progLen * SPY);
-                    break;
-                case "costPerYear":
-                    this.costPerYear = cost;
-                    this.costPerCred = (this.costPerYear / this.creds);
-                    this.costPerSem = (this.costPerYear / SPY);
+            if (costType == "costPerCred") {
+                this.costPerCred = cost;
+                this.costPerYear = (this.costPerCred * this.creds);
+                this.costPerSem = this.costPerYear / SPY;
+            } else if (costType == "costPerSem") {
+                this.costPerSem = cost;
+                this.costPerCred = this.costPerSem / credsPerSem;
+                this.costPerYear = this.costPerSem * (this.progLen * SPY);
+            } else {
+                this.costPerYear = cost;
+                this.costPerCred = (this.costPerYear / this.creds);
+                this.costPerSem = (this.costPerYear / SPY);
             }
         }
-
         this.populateProgramFormData = function() {
             $("#degree").val(this.degree);
             $("#progLen").val(this.progLen);
@@ -227,6 +238,19 @@ $(document).ready(function() {
             $("#costPerCred").val(this.costPerCred);
             $("#costPerSem").val(this.costPerSem);
             $("#costPerYear").val(this.costPerYear);
+            $.each(progOps, function(ind, op) {
+                var orig = $(".opSection");
+                var clone = orig.clone();
+                orig.append(clone);
+                op.populateProgOpFormData(ind);
+            });
+
+            $.each(progReqs, function(ind, req) {
+                var orig = $(".reqSection");
+                var clone = orig.clone();
+                orig.append(clone);
+                req.populateProgReqFormData(ind);
+            });
         }
     }
 
@@ -234,6 +258,10 @@ $(document).ready(function() {
     function ProgOp(opType, opName) {
         this.opType = opType;
         this.opName = opName;
+        this.populateProgOpFormData = function(inputId) {
+            $(".opType:eq(inputId)").val(this.opType);
+            $(".opName:eq(inputId)").val(this.opName);
+        }
     }
 
     /** Program Requirement constructor (Doc Req, Exp Req, Gen Req). Given the type, the name */
@@ -241,7 +269,23 @@ $(document).ready(function() {
         this.reqGroup = reqGroup;
         this.reqType = reqType;
         this.reqParam = reqParam;
-
-        this.populate
+        this.populateProgReqFormData = function(inputId) {
+            $("#reqGroup").val(this.reqGroup);
+            $("#reqType").val(this.reqType);
+            $("#reqParam").val(this.reqParam);
+            if(this.reqGroup == "Document Requirement") {
+                $(".expreq").hide();
+                $(".genreq").hide();
+                $(".docreq").show();
+            } else if(this.reqGroup == "Experience Requirement") {
+                $(".docreq").hide();
+                $(".expreq").show();
+                $(".genreq").hide();
+            } else {
+                $(".docreq").hide();
+                $(".expreq").hide();
+                $(".genreq").show();
+            }
+        }
     }
 });
