@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <script src="C:\Users\Iain\.WebStorm2016.2\config\javascript\extLibs\http_code.jquery.com_jquery-2.0.0.js"></script>
+    <script src="listAndFormScript.js"></script>
+    <link rel="stylesheet" type="text/css" href="candidates.css">
+    <title>Graduate School Candidate List</title>
+</head>
+<body>
+    <h1> Graduate School Candidates </h1>
+    <hr>
+    <details title="Instructions and Details">
+
+    </details>
+    <br><br>
+    <button id="btnAddSchool">Add New School Candidate</button>
+    <button id="btnDeleteAll">Delete All School Candidates</button>
+    <br><br>
+    <div id="content">
+        <table id="schoolTable">
+            <tr class="headerRow">
+                <td>School Name</td>
+                <td>State</td>
+                <td>Application Due Date</td>
+                <td>Application Fee</td>
+                <td>Program of Interest</td>
+            </tr>
+        </table>
+        <div id="schoolForm">
+            <fieldset>
+                <legend>School Information</legend>
+                <label for="schoolName">School Name:</label>
+                <input id="schoolName" type="text"><br>
+                <br><br>
+                <label for="schoolState">State:</label>
+                <select id="schoolState">
+                    <option value="New York">New York</option>
+                    <option value="Massachusetts">Massachusetts</option>
+                    <option value="Rhode Island">Rhode Island</option>
+                    <option value="North Carolina">North Carolina</option>
+                    <option value="Oregon">Oregon</option>
+                </select>
+                <br><br>
+                <label for="appDueDate">Application Due Date:</label>
+                <input id="appDueDate" type="date"><br>
+                <br><br>
+                <label for="appFee">Application Fee:</label>
+                <input id="appFee" type="number" step="any"><br>
+                <br><br>
+            </fieldset>
+            <br><br>
+            <fieldset>
+                <legend>Program Information</legend>
+                <label for="degree">Degree:</label>
+                <select id="degree">
+                    <option value="MSW">MSW</option>
+                    <option value="MAP"MAP>MAP</option>
+                    <option value="MSCP">MSCP</option>
+                </select>
+                <br>
+                <label for="creds">Credits to Complete:</label>
+                <input id="creds" type="number" step="any">
+                <br>
+                <label for="progLen">Program Length (in years):</label>
+                <input id="progLen" type="number" step="any">
+                <br><br>
+                <fieldset>
+                    <legend>Program Cost</legend>
+                    <i>Only 1 needs to be entered, the rest will be calculated.</i>
+                    <div id="costDiv">
+                        <label for="costPerCred">Per Credit: </label><input id="costPerCred" type="number" step="any">
+                        <label for="costPerSem">Per Semester:</label><input id="costPerSem" type="number" step="any">
+                        <label for="costPerYear">Per Year:</label><input id="costPerYear" type="number" step="any">
+                    </div>
+                </fieldset>
+                <br><br>
+                <fieldset>
+                    <legend>Program Options (Specializations & Concentrations):</legend>
+                    <div class="opSection">
+                        <select title="Program Option Type:" class="opType">
+                            <option value="Concentration">Concentration</option>
+                            <option value="Specialization">Specialization</option>
+                        </select>
+                        <br><br>
+                        <input title="Program Option Name:" class="opName" type="text">
+                    </div>
+                    <br><br>
+                    <button id="btnAddOp">Add Program Option</button>
+                    <button id="btnRemoveOp">Remove Last Program Option</button>
+                </fieldset>
+                <br><br>
+                <br>
+                <fieldset>
+                    <legend>Program Requirements for Acceptance</legend>
+                    <br>
+                    <div class="reqSection">
+                        <select title="Requirement Group:" class="reqGroup">
+                            <option value="Document Requirement">Document Requirement</option>
+                            <option value="Experience Requirement">Experience Requirement</option>
+                            <option value="General Requirement">General Requirement</option>
+                        </select>
+                        <br><br>
+                        <select title="Requirement Type:" class="reqType" >
+                            <option class="docreq" value="Personal Statement">Personal Statement</option>
+                            <option class="docreq" value=""
+                            <option class="expreq" id="Volunteer Experience">Volunteer Experience</option>
+                            <option class="genreq" id="Miller Analogies Test">Miller Analogies Test</option>
+                        </select>
+                        <br><br>
+                        <input title="Years/# of Docs/Score Required:" class="reqParam" type="number" step="any">
+                        <br>
+                    </div>
+                    <br><br>
+                    <button id="btnAddReq">Add Requirement</button>
+                    <button id="btnRemoveReq">Remove Last Requirement</button>
+                </fieldset>
+            </fieldset>
+            <br><br>
+            <button id="btnSave">Save</button>
+            <button id="btnCancel">Cancel</button>
+            <button id="btnDelete">Delete</button>
+        </div>
+    </div>
+    <br><br>
+    <hr>
+</body>
+</html>

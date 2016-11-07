@@ -3,15 +3,150 @@
  * Simple local web page for Danielle to track her candidate schools for graduate school
  */
 /**** GLOBAL VARIABLES, ACCESSIBLE TO THE WHOLE SCRIPT */
-/** the list of all the school objects stored in the pseudo db. */
-//var candidates = [];
+/** the list of all the school objects stored in the pseudo db.*/
+var candidates = [];
+var today = new Date();
 
 //This is the 'main()' method of this script, and will only run when the page has fully loaded.
 $(document).ready(function() {
+    console.log("Entering document ready() function... " + document.title);
     if(typeof(Storage) == "undefined") {
         alert("There is no local storage available in this browser. Exiting");
         $(document).close();
     }
+
+    //attach handlers to the buttons on the list page
+    //add new school
+    $("#btnAddSchool").on("click", function() {
+        console.log("Pressed the add school button...");
+        $("#schoolForm").css('visibility','visible');
+    });
+
+    //edit school
+    $('.editable').on("dblclick", function() {
+        var key = $(event.target).text();
+        var candidate = candidates.get(key);
+
+        //show the form
+        $("#schoolForm").css('visibility','visible');
+
+        //tell the school to populate the visible form with its data
+        candidate.populateSchoolFormData();
+    });
+
+    //delete ALL schools
+    $("#btnDeleteAll").on("click", function() {
+        var r = confirm("Are you sure you wish to delete all records?");
+        if(r == true && localStorage.length > 0) {
+            localStorage.clear();
+            $(window).reload();
+        }
+    });
+
+    //add requirement
+    $("#btnAddReq").on("click", function() {
+        var orig = $(".reqSection:last");
+        var clone = orig.clone();
+        orig.append($("<br>"));
+        orig.append(clone);
+    });
+
+    //remove requirement
+    $("#btnRemoveReq").on("click", function() {
+        var orig = $(".reqSection:last");
+        orig.remove();
+    });
+
+    //add op
+    $("#btnAddOp").on("click", function() {
+        var orig = $(".opSection:last");
+        var clone = orig.clone();
+        orig.append($("<br>"));
+        orig.append(clone);
+    });
+    //remove op
+    $("#btnRemoveOp").on("click", function() {
+        var orig = $(".opSection:last");
+        orig.remove();
+    });
+
+    //update available req types based on selected req group
+    $(".reqGroup").on("change", function() {
+        var reqGroup = $(this).val();
+        if(reqGroup == "Document Requirement") {
+            $(".expreq").css("visibility","hidden");
+            $(".genreq").css("visibility","hidden");
+            $(".docreq").css("visibility","visible");
+            $(".reqType").val("Personal Statement");
+        } else if(reqGroup == "Experience Requirement") {
+            $(".docreq").css("visibility","hidden");
+            $(".expreq").css("visibility","visible");
+            $(".genreq").css("visibility","hidden");
+            $(".reqType").val("Volunteer Experience");
+        } else {
+            $(".docreq").css("visibility","hidden");
+            $(".expreq").css("visibility","hidden");
+            $(".genreq").css("visibility","visible");
+            $(".reqType").val("Minimum GPA");
+        }
+    });
+
+    //save/create -- performed whenever the save button is pressed, for a edited or new entry
+    $("#btnSave").on("click", function() {
+        var ops = [];
+        $(".opSection").each(function() {
+            var otype = $(this).children(".opType").val();
+            var oname = $(this).children(".opName").val();
+            ops.push(new ProgOp(otype, oname));
+        });
+
+        var reqs = [];
+        $(".reqSection").each(function() {
+            var g = $(this).children(".reqGroup").val();
+            var t = $(this).children(".reqType").val();
+            var p = $(this).children(".reqParam").val();
+            reqs.push(new ProgReq(g, t, p));
+        });
+
+        console.log("reqs : " + reqs.length);
+
+        var key = $("#schoolName").val();
+        var school = new School(
+            key,
+            $("#schoolState").val(),
+            $("#appDueDate").val(),
+            $("#appFee").val(),
+            new Program(
+                $("#degree").val(),
+                $("#progLen").val(),
+                $("#creds").val(),
+                $("#costPerCred").val(),
+                $("#costPerSem").val(),
+                $("#costPerYear").val(),
+                ops,
+                reqs
+            )
+        );
+
+        localStorage.setItem(key, school);
+        $("#schoolForm").css("visibility","hidden");
+        clearForm();
+    });
+
+    //cancel
+    $("#btnCancel").on('click', function(){
+       console.log("school addition cancelled");
+       $("#schoolForm").css('visibility','hidden');
+       clearForm();
+    });
+
+    //delete
+    $("#btnDelete").on("click", function() {
+        var key = $("#schoolName");
+        localStorage.removeItem(key);
+        $("#schoolForm").css('visibility','hidden');
+        clearForm();
+    });
 
     //if there are candidates in storage, load them and parse them into objects
     if(localStorage.length > 0) {
@@ -61,135 +196,25 @@ $(document).ready(function() {
     } else {
         alert("No school candidates have been added yet. Click on the 'Add New School' button below to add one.");
     }
-    //attach handlers to the buttons on the list page
-    //add new school
-    $("#btnAddSchool").click(function() {
-        $("#formFrame").css("visibility","visible");
-        //the form, in this case, should be empty
-    });
 
-    //edit school
-    $('.editable').dblclick(function() {
-        var key = $(event.target).text();
-        var candidate = candidates.get(key);
-
-        //show the form
-        $("#formFrame").css("visibility","visible");
-
-        //tell the school to populate the visible form with its data
-        candidate.populateSchoolFormData();
-    });
-
-    //delete ALL schools
-    $("#deleteAll").click(function() {
-        var r = confirm("Are you sure you wish to delete all records?");
-        if(r == true) {
-            localStorage.clear();
-            $(window).reload();
-        }
-    });
-
-    //attach handlers to the form page
-    //add requirement
-    $("#btnAddReq").click(function() {
-        var orig = $("#schoolForm").find(".reqSection:last");
-        var clone = orig.clone();
-        orig.append(clone);
-    });
-
-    //remove requirement
-    $("#btnRemoveReq").click(function() {
-        var orig = $("#schoolForm").find(".reqSection:last");
-        orig.remove();
-    });
-
-    //add op
-    $("#btnAddOp").click(function() {
-        var orig = $("#schoolForm").find(".opSection:last");
-        var clone = orig.clone();
-        orig.append(clone);
-    });
-    //remove op
-    $("#btnRemoveReq").click(function() {
-        var orig = $("#schoolForm").find(".opSection:last");
-        orig.remove();
-    });
-
-    //update available req types based on selected req group
-    $(".reqGroup").onchange(function() {
-        var reqGroup = $(this).val();
-        if(reqGroup == "Document Requirement") {
-            $(".expreq").css("visibility","hidden");
-            $(".genreq").css("visibility","hidden");
-            $(".docreq").css("visibility","visible");
-        } else if(reqGroup == "Experience Requirement") {
-            $(".docreq").css("visibility","hidden");
-            $(".expreq").css("visibility","visible");
-            $(".genreq").css("visibility","hidden");
-        } else {
-            $(".docreq").css("visibility","hidden");
-            $(".expreq").css("visibility","hidden");
-            $(".genreq").css("visibility","visible");
-        }
-    });
-
-    //save/create -- performed whenever the save button is pressed, for a edited or new entry
-    $("#schoolForm").find("#btnSave").click(function() {
-        alert("attempting save");
-        var ops = [];
-        $("#schoolForm").find(".opSection").each(function() {
-            var otype = $(this).children(".opType").val();
-            var oname = $(this).children(".opName").val();
-            ops.push(new ProgOp(otype, oname));
-        });
-
-        console.log("ops : " + ops.length);
-
-        var reqs = [];
-        $("#schoolForm").find(".reqSection").each(function() {
-            var g = $(this).children(".reqGroup").val();
-            var t = $(this).children(".reqType").val();
-            var p = $(this).children(".reqParam").val();
-            reqs.push(new ProgReq(g, t, p));
-        });
-
-        console.log("reqs : " + reqs.length);
-
-        var key = $("#schoolName").val();
-        var school = new School(
-            key,
-            $("#schoolState").val(),
-            $("#appDueDate").val(),
-            $("#appFee").val(),
-            new Program(
-                $("#degree").val(),
-                $("#progLen").val(),
-                $("#creds").val(),
-                $("#costPerCred").val(),
-                $("#costPerSem").val(),
-                $("#costPerYear").val(),
-                ops,
-                reqs
-            )
-        );
-
-        localStorage.setItem(key, school);
-        $("#formFrame").css("visibility","hidden");
-        $(window).reload();
-    });
-
-    //cancel
-    $("#btnCancel").click(function() {
-        $("#formFrame").css("visibility","hidden");
-    });
-
-    //delete
-    $("#btnDelete").click(function() {
-        var key = $("#schoolForm").find("#schoolName");
-        localStorage.removeItem(key);
-        $("#formFrame").css("visibility","hidden");
-        $(window).reload();
-    });
+    function clearForm() {
+        $("#schoolName").val("");
+        $("#schoolState").val("New York");
+        $("#appDueDate").val('');
+        $("#appFee").val("");
+        $("#creds").val("");
+        $("#costPerCred").val("");
+        $("#costPerSem").val("");
+        $("#costPerYear").val("");
+        $(".reqGroup").val("Document Requirement");
+        $(".reqType").val("Personal Statement");
+        $(".opType").val("Concentration");
+        $(".opName").val("");
+        $("#degree").val("MSW");
+        $("#progLen").val("");
+        $(".opSection").not(":first").remove();
+        $(".reqSection").not(":first").remove();
+    }
 
     /** GraduateSchool candidate object constructor
      * params: school's name, state it's in, application due date and fee, and the program of interest*/
@@ -254,7 +279,8 @@ $(document).ready(function() {
                 this.costPerCred = (this.costPerYear / this.creds);
                 this.costPerSem = (this.costPerYear / SPY);
             }
-        }
+        };
+
         this.populateProgramFormData = function() {
             $("#degree").val(this.degree);
             $("#progLen").val(this.progLen);

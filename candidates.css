@@ -9,6 +9,7 @@
 #schoolTable {
     display:table;
     border: solid 1px black;
+    float:left;
 }
 
 .progOpsList {
@@ -24,4 +25,21 @@
     width:90%;
     height:650px;
     border:1px solid black;
+}
+
+.expreq {
+    visibility: hidden;
+}
+
+.genreq {
+    visibility: hidden;
+}
+
+.docreq {
+    visibility:hidden;
+}
+
+#schoolForm {
+    visibility: hidden;
+    float:right;
 }
