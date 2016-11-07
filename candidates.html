@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <script src="C:\Users\Iain\.WebStorm2016.2\config\javascript\extLibs\http_code.jquery.com_jquery-2.0.0.js"></script>
+    <script src="C:\Users\admin\.WebStorm2016.2\config\javascript\extLibs\http_code.jquery.com_jquery-2.0.0.js"></script>
     <script src="listAndFormScript.js"></script>
     <link rel="stylesheet" type="text/css" href="candidates.css">
     <title>Graduate School Candidate List</title>
@@ -103,13 +103,29 @@
                         <br><br>
                         <select title="Requirement Type:" class="reqType" >
                             <option class="docreq" value="Personal Statement">Personal Statement</option>
-                            <option class="docreq" value=""
-                            <option class="expreq" id="Volunteer Experience">Volunteer Experience</option>
-                            <option class="genreq" id="Miller Analogies Test">Miller Analogies Test</option>
+                            <option class="docreq" value="Letter of Recommendation">Letter of Recommendation</option>
+                            <option class="docreq" value="Field Placement Form">Field Placement Form</option>
+                            <option class="docreq" value="Resume">Resume</option>
+                            <option class="docreq" value="All Transcripts">All Transcripts</option>
+                            <option class="docreq" value="Admissions Essay">Admissions Essay</option>
+                            <option class="docreq" value="Course List Form">Course List Form</option>
+                            <option class="docreq" value="Financial Aid Form">Financial Aid Form</option>
+                            <option class="expreq" value="Volunteer Experience">Volunteer Experience</option>
+                            <option class="genreq" value="Miller Analogies Test">Miller Analogies Test</option>
+                            <option class="genreq" value="GRE">GRE</option>
+                            <option class="genreq" value="GRE Psychology Test">GRE Psychology Test</option>
+                            <option class="genreq" value="Minimum GPA">Minimum GPA</option>
                         </select>
                         <br><br>
                         <input title="Years/# of Docs/Score Required:" class="reqParam" type="number" step="any">
                         <br>
+                    </div>
+                    <div id="extrasSection">
+                        <i>These aren't functional yet...</i>
+                        <label>Extras (Add files, links, and/or embedded pages)</label>
+                        <button id="btnAddFile">Add a File</button>
+                        <button id="btnAddLink">Add a Link</button>
+                        <button id="btnEmbedPage">Add an Embedded Web-Page</button>
                     </div>
                     <br><br>
                     <button id="btnAddReq">Add Requirement</button>

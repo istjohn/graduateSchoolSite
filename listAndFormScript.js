@@ -148,6 +148,10 @@ $(document).ready(function() {
         clearForm();
     });
 
+    $("#btnAddFile").on("click", function() {
+       $("#extrasSection").append($("<input type='file'>"));
+    });
+
     //if there are candidates in storage, load them and parse them into objects
     if(localStorage.length > 0) {
         for(var i = 0; i < localStorage.length; i++) {
@@ -214,6 +218,7 @@ $(document).ready(function() {
         $("#progLen").val("");
         $(".opSection").not(":first").remove();
         $(".reqSection").not(":first").remove();
+        $("#extrasSection").empty();
     }
 
     /** GraduateSchool candidate object constructor
@@ -244,19 +249,20 @@ $(document).ready(function() {
         this.costPerCred = 0.0;
         this.costPerSem = 0.0;
         this.costPerYear = 0.0;
-
+        var costType
         //Check which, if any, of the costs are still 0.
         if(cpc && (!cps && !cpy)) {
-            this.calculateAllCosts("costPerCred",cpc);
+            calculateAllCosts("costPerCred",cpc);
         } else if(cps && (!cpc && !cpy)) {
-            this.calculateAllCosts("costPerSem",cps);
+            calculateAllCosts("costPerSem",cps);
         } else if(cpy && (!cpc && !cps)) {
-            this.calculateAllCosts("costPerYear", cpy);
+            calculateAllCosts("costPerYear", cpy);
         } else {
             this.costPerCred = cpc;
             this.costPerSem = cps;
             this.costPerYear = cpy;
         }
+
         this.progOps = progOps;
         this.progReqs = progReqs;
 
@@ -279,8 +285,7 @@ $(document).ready(function() {
                 this.costPerCred = (this.costPerYear / this.creds);
                 this.costPerSem = (this.costPerYear / SPY);
             }
-        };
-
+        }
         this.populateProgramFormData = function() {
             $("#degree").val(this.degree);
             $("#progLen").val(this.progLen);
