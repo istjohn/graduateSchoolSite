@@ -47,12 +47,21 @@ td {
 }
 
 .opSection {
-    border:1px solid gray;
+    border:1px solid darkgreen;
     border-radius:5px;
     width:250px;
+    background-color:lightgray;;
 }
 
 .reqSection {
-    padding:15px 0;
+    border:1px solid darkblue;
+    border-radius:5px;
+    width:250px;
+    background-color:lightgray;
+}
 
+.editable {
+    color:orange;
+    font-style: oblique;
+    text-underline: dash-long-heavy;
 }

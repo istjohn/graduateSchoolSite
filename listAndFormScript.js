@@ -5,7 +5,6 @@
 /**** GLOBAL VARIABLES, ACCESSIBLE TO THE WHOLE SCRIPT */
 /** the list of all the school objects stored in the pseudo db.*/
 var candidates = [];
-var progReqTemplate = $("<div class='reqSection'><select")
 
 //This is the 'main()' method of this script, and will only run when the page has fully loaded.
 $(document).ready(function() {
@@ -47,7 +46,7 @@ $(document).ready(function() {
 
     //add op
     $("#btnAddOp").on("click", function() {
-        var orig = $(".opSection:last");
+        var orig = $("#opRoot");
         var clone = orig.clone();
         orig.append($("<br>"));
         orig.append(clone);
@@ -59,23 +58,24 @@ $(document).ready(function() {
     });
 
     //update available req types based on selected req group
-    $(".reqGroup").on("change", function() {
-        var reqGroup = $(this).val();
+    $("#progReqs").on("change", ".reqGroup", function(ind) {
+        var i = ind + 1;
+        var reqGroup = $(this).children("select:nth-of-type("+i+")");
         if(reqGroup == "Document Requirement") {
-            $(".expreq").css("visibility","hidden");
-            $(".genreq").css("visibility","hidden");
-            $(".docreq").css("visibility","visible");
-            $(".reqType").val("Personal Statement");
+            reqGroup.children(".expreq").css("visibility","hidden");
+            reqGroup.children(".genreq").css("visibility","hidden");
+            reqGroup.children(".docreq").css("visibility","visible");
+            reqGroup.children(".reqType").val("Personal Statement");
         } else if(reqGroup == "Experience Requirement") {
-            $(".docreq").css("visibility","hidden");
-            $(".expreq").css("visibility","visible");
-            $(".genreq").css("visibility","hidden");
-            $(".reqType").val("Volunteer Experience");
+            reqGroup.children(".docreq").css("visibility","hidden");
+            reqGroup.children(".expreq").css("visibility","visible");
+            reqGroup.children(".genreq").css("visibility","hidden");
+            reqGroup.children(".reqType").val("Volunteer Experience");
         } else {
-            $(".docreq").css("visibility","hidden");
-            $(".expreq").css("visibility","hidden");
-            $(".genreq").css("visibility","visible");
-            $(".reqType").val("Minimum GPA");
+            reqGroup.children(".docreq").css("visibility","hidden");
+            reqGroup.children(".expreq").css("visibility","hidden");
+            reqGroup.children(".genreq").css("visibility","visible");
+            reqGroup.children(".reqType").val("Minimum GPA");
         }
     });
 
@@ -96,6 +96,12 @@ $(document).ready(function() {
             reqs.push(new ProgReq(g, t, p));
         });
 
+        var links = [];
+        $(".linkSection").each(function() {
+            console.log("school link val = " + $(".schoolLink").val());
+            links.push($(".schoolLink").val());
+        });
+
         console.log("reqs : " + reqs.length);
 
         var key = $("#schoolName").val();
@@ -113,7 +119,8 @@ $(document).ready(function() {
                 $("#costPerYear").val(),
                 ops,
                 reqs
-            )
+            ),
+            links
         );
 
         var jsonschool = JSON.stringify(school);
@@ -138,8 +145,11 @@ $(document).ready(function() {
         clearForm();
     });
 
-    $("#btnAddFile").on("click", function() {
-       $("#extrasSection").append($("<input type='file'>"));
+    $("#btnAddLink").on("click", function() {
+        var clone = $("#linkRoot").clone();
+        clone.removeProp('id');
+        clone.val("");
+        $("#linkRoot").append(clone);
     });
 
     //if there are candidates in storage, load them and parse them into objects
@@ -172,8 +182,8 @@ $(document).ready(function() {
                 new Program(rawprog['degree'],rawprog['progLen'],rawprog['creds'],rawprog['costPerCred'],
                     rawprog['costPerSem'],rawprog['costPerYear'],
                     ops,
-                    reqs
-                )
+                    reqs),
+                jsonObj['schoolLinks']
             );
 
             if(school instanceof School) {
@@ -200,6 +210,16 @@ $(document).ready(function() {
                reqs.append($("<li>").text("["+req.reqGroup+"] : "+req.reqParam + " " + req.reqType));
            });
 
+           var links = $("<ul class='schoolLinkList'>");
+           $.each(candidate.schoolLinks, function(ind, link) {
+               var ah = $("<a>");
+               ah.prop('href',link);
+               ah.prop('target','_blank');
+               ah.text(link);
+              links.append($("<li>")
+                  .append(ah));
+           });
+
             $("#schoolTable").append($("<tr>")
                 .append($("<td class='editable'>").text(candidate.schoolName))
                 .append($("<td>").text(candidate.schoolState))
@@ -219,6 +239,7 @@ $(document).ready(function() {
                         )
                     )
                 )
+                .append(links)
             );
         });
     } else {
@@ -260,22 +281,39 @@ $(document).ready(function() {
         $("#progLen").val("");
         $(".opSection").not(":first").remove();
         $(".reqSection").not(":first").remove();
-        $("#extrasSection").empty();
+        $(".linkSection").not(":first").remove();
     }
 
     /** GraduateSchool candidate object constructor
      * params: school's name, state it's in, application due date and fee, and the program of interest*/
-    function School(schoolName, schoolState, appDueDate, appFee, prog) {
+    function School(schoolName, schoolState, appDueDate, appFee, prog, links) {
         this.schoolName = schoolName;
         this.schoolState = schoolState;
         this.appDueDate = appDueDate;
         this.appFee = appFee;
         this.prog = prog;
+        this.schoolLinks = [];
+        if(links instanceof Array) {
+            this.schoolLinks = links.slice();
+        }
         this.populateSchoolFormData = function () {
             $("#schoolName").val(this.schoolName);
             $("#schoolState").val(this.schoolState);
             $("#appDueDate").val(this.appDueDate);
             $("#appFee").val(this.appFee);
+            if(this.schoolLinks.length == 0) {
+                $(".linkSection").not(":first").remove();
+            } else if(this.schoolLinks.length ==1) {
+                $("#linkRoot").val(this.schoolLinks[0]);
+            } else {
+                $.each(this.schoolLinks, function(ind, link){
+                   var clone = $("#linkRoot").clone();
+                    clone.removeProp('id');
+                    $("#linkRoot").append(clone);
+                    var i = ind+1;
+                    $("#links").children("div:nth-of-type("+i+")").children(".schoolLink").val(link);
+                });
+            }
             this.prog.populateProgramFormData();
         };
     }
@@ -381,17 +419,17 @@ $(document).ready(function() {
             $("div:nth-of-type("+ind+")").children(".reqType").val(this.reqType);
             $("div:nth-of-type("+ind+")").children(".reqParam").val(this.reqParam);
             if(this.reqGroup == "Document Requirement") {
-                $(".expreq").css("visibility","hidden");
-                $(".genreq").css("visibility","hidden");
-                $(".docreq").css("visibility","visible");
+                $("option:nth-of-type("+ind+")").children(".expreq").css("visibility","hidden");
+                $("option:nth-of-type("+ind+")").children(".genreq").css("visibility","hidden");
+                $("option:nth-of-type("+ind+")").children(".docreq").css("visibility","visible");
             } else if(this.reqGroup == "Experience Requirement") {
-                $(".docreq").css("visibility","hidden");
-                $(".expreq").css("visibility","visible");
-                $(".genreq").css("visibility","hidden");
+                $("option:nth-of-type("+ind+")").children(".docreq").css("visibility","hidden");
+                $("option:nth-of-type("+ind+")").children(".expreq").css("visibility","visible");
+                $("option:nth-of-type("+ind+")").children(".genreq").css("visibility","hidden");
             } else {
-                $(".docreq").css("visibility","hidden");
-                $(".expreq").css("visibility","hidden");
-                $(".genreq").css("visibility","visible");
+                $("option:nth-of-type("+ind+")").children(".docreq").css("visibility","hidden");
+                $("option:nth-of-type("+ind+")").children(".expreq").css("visibility","hidden");
+                $("option:nth-of-type("+ind+")").children(".genreq").css("visibility","visible");
             }
         }
     }

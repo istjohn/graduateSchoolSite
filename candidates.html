@@ -11,7 +11,15 @@
     <h1> Graduate School Candidates </h1>
     <hr>
     <details title="Instructions and Details">
-
+        <def>Requirement Parameter: IF...
+            <ul>
+                <li>Document Requirement = # of documents required</li>
+                <li>Experience Requirement = amount of experience required</li>
+                <li>General Requirement (Minimum GPA) = the minimum GPA required</li>
+            </ul>
+        </def>
+        <br>
+        <b>To edit or delete an existing school, double-click its "School Name" in the appropriate cell of the first column.</b>
     </details>
     <br><br>
     <button id="btnAddSchool">Add New School Candidate</button>
@@ -25,6 +33,7 @@
                 <td>Application Due Date</td>
                 <td>Application Fee</td>
                 <td>Program of Interest</td>
+                <td>Reference Links</td>
             </tr>
         </table>
         <div id="schoolForm">
@@ -95,7 +104,7 @@
                 </fieldset>
                 <br><br>
                 <br>
-                <fieldset>
+                <fieldset id="progReqs">
                     <legend>Program Requirements for Acceptance</legend>
                     <br>
                     <div class="reqSection" id="reqRoot">
@@ -117,6 +126,7 @@
                             <option class="docreq" value="Course List Form">Course List Form</option>
                             <option class="docreq" value="Financial Aid Form">Financial Aid Form</option>
                             <option class="expreq" value="Volunteer Experience">Volunteer Experience</option>
+                            <option class="expreq" value="Work Experience">Work Experience</option>
                             <option class="genreq" value="Miller Analogies Test">Miller Analogies Test</option>
                             <option class="genreq" value="GRE">GRE</option>
                             <option class="genreq" value="GRE Psychology Test">GRE Psychology Test</option>
@@ -133,6 +143,14 @@
                 </fieldset>
             </fieldset>
             <br><br>
+            <fieldset id="links">
+                <legend>School Links</legend>
+                <div class="linkSection" id="linkRoot"></div>
+                <label>URL: <i>Copy & Paste the Page you want to use later</i></label>
+                <input type="url" class="schoolLink">
+                <br><br>
+                <button id="btnAddLink">Add Link</button>
+            </fieldset>
             <button id="btnSave">Save</button>
             <button id="btnCancel">Cancel</button>
             <button id="btnDelete">Delete</button>
