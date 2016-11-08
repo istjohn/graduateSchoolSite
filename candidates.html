@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <script src="C:\Users\admin\.WebStorm2016.2\config\javascript\extLibs\http_code.jquery.com_jquery-2.0.0.js"></script>
+    <script src="jquery-2.0.0.js"></script>
     <script src="listAndFormScript.js"></script>
     <link rel="stylesheet" type="text/css" href="candidates.css">
     <title>Graduate School Candidate List</title>
@@ -58,10 +58,10 @@
                     <option value="MAP"MAP>MAP</option>
                     <option value="MSCP">MSCP</option>
                 </select>
-                <br>
+                <br><br>
                 <label for="creds">Credits to Complete:</label>
                 <input id="creds" type="number" step="any">
-                <br>
+                <br><br>
                 <label for="progLen">Program Length (in years):</label>
                 <input id="progLen" type="number" step="any">
                 <br><br>
@@ -70,20 +70,24 @@
                     <i>Only 1 needs to be entered, the rest will be calculated.</i>
                     <div id="costDiv">
                         <label for="costPerCred">Per Credit: </label><input id="costPerCred" type="number" step="any">
+                        <br><br>
                         <label for="costPerSem">Per Semester:</label><input id="costPerSem" type="number" step="any">
+                        <br><br>
                         <label for="costPerYear">Per Year:</label><input id="costPerYear" type="number" step="any">
                     </div>
                 </fieldset>
                 <br><br>
-                <fieldset>
+                <fieldset id="progOps">
                     <legend>Program Options (Specializations & Concentrations):</legend>
-                    <div class="opSection">
-                        <select title="Program Option Type:" class="opType">
+                    <div class="opSection" id="opRoot">
+                        <label>Option Type:</label>
+                        <select class="opType">
                             <option value="Concentration">Concentration</option>
                             <option value="Specialization">Specialization</option>
                         </select>
                         <br><br>
-                        <input title="Program Option Name:" class="opName" type="text">
+                        <label>Option Name:</label>
+                        <input class="opName" type="text">
                     </div>
                     <br><br>
                     <button id="btnAddOp">Add Program Option</button>
@@ -94,14 +98,16 @@
                 <fieldset>
                     <legend>Program Requirements for Acceptance</legend>
                     <br>
-                    <div class="reqSection">
-                        <select title="Requirement Group:" class="reqGroup">
+                    <div class="reqSection" id="reqRoot">
+                        <label>Requirement Group:</label>
+                        <select class="reqGroup">
                             <option value="Document Requirement">Document Requirement</option>
                             <option value="Experience Requirement">Experience Requirement</option>
                             <option value="General Requirement">General Requirement</option>
                         </select>
                         <br><br>
-                        <select title="Requirement Type:" class="reqType" >
+                        <label>Requirement Type:</label>
+                        <select class="reqType">
                             <option class="docreq" value="Personal Statement">Personal Statement</option>
                             <option class="docreq" value="Letter of Recommendation">Letter of Recommendation</option>
                             <option class="docreq" value="Field Placement Form">Field Placement Form</option>
@@ -117,15 +123,9 @@
                             <option class="genreq" value="Minimum GPA">Minimum GPA</option>
                         </select>
                         <br><br>
-                        <input title="Years/# of Docs/Score Required:" class="reqParam" type="number" step="any">
+                        <label>Requirement Parameter:</label>
+                        <input class="reqParam" type="number" step="any">
                         <br>
-                    </div>
-                    <div id="extrasSection">
-                        <i>These aren't functional yet...</i>
-                        <label>Extras (Add files, links, and/or embedded pages)</label>
-                        <button id="btnAddFile">Add a File</button>
-                        <button id="btnAddLink">Add a Link</button>
-                        <button id="btnEmbedPage">Add an Embedded Web-Page</button>
                     </div>
                     <br><br>
                     <button id="btnAddReq">Add Requirement</button>

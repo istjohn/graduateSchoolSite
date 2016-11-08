@@ -4,12 +4,22 @@
     font-size:12pt;
     text-underline:single;
     border:solid 1px black;
+    background-color:darkgray;
+    font-weight: bold;
+    color:ghostwhite;
+}
+
+td {
+    display:table-cell;
+    border:solid 1px black;
+    margin:5px;
 }
 
 #schoolTable {
     display:table;
-    border: solid 1px black;
+    border: solid 2px darkviolet;
     float:left;
+    width:45%;
 }
 
 .progOpsList {
@@ -19,14 +29,6 @@
 .progReqsList {
     float:right;
 }
-
-#formFrame {
-    visibility: hidden;
-    width:90%;
-    height:650px;
-    border:1px solid black;
-}
-
 .expreq {
     visibility: hidden;
 }
@@ -34,7 +36,6 @@
 .genreq {
     visibility: hidden;
 }
-
 .docreq {
     visibility:hidden;
 }
@@ -42,4 +43,16 @@
 #schoolForm {
     visibility: hidden;
     float:right;
+    width:40%;
+}
+
+.opSection {
+    border:1px solid gray;
+    border-radius:5px;
+    width:250px;
+}
+
+.reqSection {
+    padding:15px 0;
+
 }

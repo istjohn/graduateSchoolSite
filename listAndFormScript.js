@@ -5,7 +5,7 @@
 /**** GLOBAL VARIABLES, ACCESSIBLE TO THE WHOLE SCRIPT */
 /** the list of all the school objects stored in the pseudo db.*/
 var candidates = [];
-var today = new Date();
+var progReqTemplate = $("<div class='reqSection'><select")
 
 //This is the 'main()' method of this script, and will only run when the page has fully loaded.
 $(document).ready(function() {
@@ -22,24 +22,12 @@ $(document).ready(function() {
         $("#schoolForm").css('visibility','visible');
     });
 
-    //edit school
-    $('.editable').on("dblclick", function() {
-        var key = $(event.target).text();
-        var candidate = candidates.get(key);
-
-        //show the form
-        $("#schoolForm").css('visibility','visible');
-
-        //tell the school to populate the visible form with its data
-        candidate.populateSchoolFormData();
-    });
-
     //delete ALL schools
     $("#btnDeleteAll").on("click", function() {
         var r = confirm("Are you sure you wish to delete all records?");
         if(r == true && localStorage.length > 0) {
             localStorage.clear();
-            $(window).reload();
+            reload();
         }
     });
 
@@ -128,7 +116,9 @@ $(document).ready(function() {
             )
         );
 
-        localStorage.setItem(key, school);
+        var jsonschool = JSON.stringify(school);
+
+        localStorage.setItem(key, jsonschool);
         $("#schoolForm").css("visibility","hidden");
         clearForm();
     });
@@ -154,10 +144,44 @@ $(document).ready(function() {
 
     //if there are candidates in storage, load them and parse them into objects
     if(localStorage.length > 0) {
+        console.log("Candidates in storage: " + localStorage.length);
+        console.log("Retrieving candidates from storage...");
         for(var i = 0; i < localStorage.length; i++) {
             var k = localStorage.key(i);
+            console.log("At index["+i+"] key = '"+k+"'.");
             var jsonCandidate = localStorage.getItem(k);
-            var school = $.parseJSON(jsonCandidate);
+            console.log("JSON with with key:\n" + jsonCandidate);
+            var jsonObj = JSON.parse(jsonCandidate);
+
+            var rawprog = jsonObj['prog'];
+
+            var rawops = rawprog['progOps'];
+            var ops = [];
+            $.each(rawops, function(ind, rawop){
+               ops.push(new ProgOp(rawop['opType'],rawop['opName']));
+            });
+
+            var rawreqs = rawprog['progReqs'];
+            var reqs = [];
+            $.each(rawreqs, function(ind, rawreq){
+                reqs.push(new ProgReq(rawreq['reqGroup'],rawreq['reqType'],rawreq['reqParam']));
+            });
+
+            var school = new School(
+                jsonObj["schoolName"],jsonObj["schoolState"],jsonObj["appDueDate"],jsonObj["appFee"],
+                new Program(rawprog['degree'],rawprog['progLen'],rawprog['creds'],rawprog['costPerCred'],
+                    rawprog['costPerSem'],rawprog['costPerYear'],
+                    ops,
+                    reqs
+                )
+            );
+
+            if(school instanceof School) {
+                console.log("JSON object in local storage successfully converted into a School!");
+            } else {
+                console.log("Failed to parse JSON object into a School!");
+            }
+
             candidates.push(school);
         }
     }
@@ -183,12 +207,12 @@ $(document).ready(function() {
                 .append($("<td>").text(candidate.appFee))
                 .append($("<td>")
                     .append($("<details>")
-                        .append($("<summary>").text(prog.degree))
-                        .append($("<p>"))
-                        .append($("<p>"))
-                        .append($("<p>").text("Costs:"))
-                        .append($("<p>").text("Per:(Credit, Semester, Year)"))
-                        .append($("<p>").text("("+prog.costPerCred+", "+prog.costPerSem+", "+prog.costPerYear+")"))
+                        .append($("<summary>").text("Degree:"+prog.degree))
+                        .append($("<p>").text("Credits to Complete:"+prog.creds))
+                        .append($("<p>").text("Program Length:"+prog.progLen))
+                        .append($("<p>").text("Cost per Credit: $"+prog.costPerCred))
+                        .append($("<p>").text("Cost per Semester: $"+prog.costPerSem))
+                        .append($("<p>").text("Cost per Academic Year: $"+prog.costPerYear))
                         .append($("<div>")
                             .append(ops)
                             .append(reqs)
@@ -200,6 +224,24 @@ $(document).ready(function() {
     } else {
         alert("No school candidates have been added yet. Click on the 'Add New School' button below to add one.");
     }
+
+    //edit school
+    $('#schoolTable').on('dblclick', '.editable', function() {
+        var key = $(event.target).text();
+        var candidate;
+        for(var i = 0; i < candidates.length; i++) {
+            if(candidates[i].schoolName == key) {
+                candidate = candidates[i];
+            }
+        }
+
+        console.log("Opening form to edit object:\n"+JSON.stringify(candidate));
+        //show the form
+        $("#schoolForm").css('visibility','visible');
+
+        //tell the school to populate the visible form with its data
+        candidate.populateSchoolFormData();
+    });
 
     function clearForm() {
         $("#schoolName").val("");
@@ -229,13 +271,13 @@ $(document).ready(function() {
         this.appDueDate = appDueDate;
         this.appFee = appFee;
         this.prog = prog;
-        this.populateSchoolFormData = function() {
+        this.populateSchoolFormData = function () {
             $("#schoolName").val(this.schoolName);
             $("#schoolState").val(this.schoolState);
             $("#appDueDate").val(this.appDueDate);
             $("#appFee").val(this.appFee);
             this.prog.populateProgramFormData();
-        }
+        };
     }
 
     /** Program constructor
@@ -243,80 +285,90 @@ $(document).ready(function() {
      * per semester, or per academic year, and that individual cost (the rest will be calculated) the program options, and the
      * program requirements for acceptance*/
     function Program(degree, progLen, creds, cpc, cps, cpy, progOps, progReqs) {
+        var SPY = 2.0;
         this.degree = degree;
         this.progLen = progLen;
         this.creds = creds;
         this.costPerCred = 0.0;
         this.costPerSem = 0.0;
         this.costPerYear = 0.0;
-        var costType
+        this.costType = "";
+        var credsPerSem = this.creds / this.progLen;
         //Check which, if any, of the costs are still 0.
         if(cpc && (!cps && !cpy)) {
-            calculateAllCosts("costPerCred",cpc);
+            this.costPerCred = cpc;
+            this.costPerYear = (this.costPerCred * this.creds);
+            this.costPerSem = this.costPerYear / SPY;
         } else if(cps && (!cpc && !cpy)) {
-            calculateAllCosts("costPerSem",cps);
+            this.costPerSem = cps;
+            this.costPerCred = this.costPerSem / credsPerSem;
+            this.costPerYear = this.costPerSem * (this.progLen * SPY);
         } else if(cpy && (!cpc && !cps)) {
-            calculateAllCosts("costPerYear", cpy);
+            this.costPerYear = cpy;
+            this.costPerCred = (this.costPerYear / this.creds);
+            this.costPerSem = (this.costPerYear / SPY);
         } else {
             this.costPerCred = cpc;
             this.costPerSem = cps;
             this.costPerYear = cpy;
         }
-
-        this.progOps = progOps;
-        this.progReqs = progReqs;
-
-        /** Program functions */
-        this.calculateAllCosts = function(costType, cost) {
-            //Always 2 semesters in any academic year
-            var SPY = 2.0;
-            var credsPerSem = this.creds / this.progLen;
-
-            if (costType == "costPerCred") {
-                this.costPerCred = cost;
-                this.costPerYear = (this.costPerCred * this.creds);
-                this.costPerSem = this.costPerYear / SPY;
-            } else if (costType == "costPerSem") {
-                this.costPerSem = cost;
-                this.costPerCred = this.costPerSem / credsPerSem;
-                this.costPerYear = this.costPerSem * (this.progLen * SPY);
-            } else {
-                this.costPerYear = cost;
-                this.costPerCred = (this.costPerYear / this.creds);
-                this.costPerSem = (this.costPerYear / SPY);
-            }
+        this.progOps = [];
+        this.progReqs = [];
+        if(progOps instanceof Array) {
+            this.progOps = progOps.slice();
         }
-        this.populateProgramFormData = function() {
+
+        if(progReqs instanceof  Array) {
+            this.progReqs = progReqs.slice();
+        }
+        /** Program functions */
+        this.populateProgramFormData = function () {
             $("#degree").val(this.degree);
             $("#progLen").val(this.progLen);
             $("#creds").val(this.creds);
-            $("#costPerCred").val(this.costPerCred);
-            $("#costPerSem").val(this.costPerSem);
-            $("#costPerYear").val(this.costPerYear);
-            $.each(progOps, function(ind, op) {
-                var orig = $(".opSection");
-                var clone = orig.clone();
-                orig.append(clone);
-                op.populateProgOpFormData(ind);
-            });
+            $("#costPerCred").val(parseFloat(this.costPerCred).toFixed(2));
+            $("#costPerSem").val(parseFloat(this.costPerSem).toFixed(2));
+            $("#costPerYear").val(parseFloat(this.costPerYear).toFixed(2));
 
-            $.each(progReqs, function(ind, req) {
-                var orig = $(".reqSection");
-                var clone = orig.clone();
-                orig.append(clone);
-                req.populateProgReqFormData(ind);
-            });
-        }
+            if(this.progOps.length == 0) {
+                $("#opRoot").remove();
+            } else if(this.progOps.length == 1) {
+                this.progOps[0].populateProgOpFormData(1);
+            } else {
+                this.progOps[0].populateProgOpFormData(1);
+                var root = $("#opRoot");
+                $.each(this.progOps.slice(1), function(ind, op) {
+                    var clone = root.clone();
+                    clone.remove('id');
+                    op.populateProgOpFormData(ind+1);
+                });
+            }
+
+            if(this.progReqs.length == 0) {
+                $("#reqRoot").remove();
+            } else if(this.progReqs.length == 1) {
+                this.progReqs[0].populateProgReqFormData(1);
+            } else {
+                this.progReqs[0].populateProgReqFormData(1);
+                var root = $("#reqRoot");
+                $.each(this.progReqs.slice(1), function(ind, op) {
+                    var clone = root.clone();
+                    clone.remove('id');
+                    op.populateProgReqFormData(ind+1);
+                });
+            }
+
+        };
     }
 
     /** Program Option constructor i.e: Specializations & Concentrations. Given the type and the name*/
     function ProgOp(opType, opName) {
         this.opType = opType;
         this.opName = opName;
-        this.populateProgOpFormData = function(inputId) {
-            $(".opType:eq(inputId)").val(this.opType);
-            $(".opName:eq(inputId)").val(this.opName);
-        }
+        this.populateProgOpFormData = function (ind) {
+            $("div:nth-of-type("+ind+")").children(".opType").val(this.opType);
+            $("div:nth-of-type("+ind+")").children(".opName").val(this.opName);
+        };
     }
 
     /** Program Requirement constructor (Doc Req, Exp Req, Gen Req). Given the type, the name */
@@ -324,10 +376,10 @@ $(document).ready(function() {
         this.reqGroup = reqGroup;
         this.reqType = reqType;
         this.reqParam = reqParam;
-        this.populateProgReqFormData = function(inputId) {
-            $("#reqGroup").val(this.reqGroup);
-            $("#reqType").val(this.reqType);
-            $("#reqParam").val(this.reqParam);
+        this.populateProgReqFormData = function(ind) {
+            $("div:nth-of-type("+ind+")").children(".reqGroup").val(this.reqGroup);
+            $("div:nth-of-type("+ind+")").children(".reqType").val(this.reqType);
+            $("div:nth-of-type("+ind+")").children(".reqParam").val(this.reqParam);
             if(this.reqGroup == "Document Requirement") {
                 $(".expreq").css("visibility","hidden");
                 $(".genreq").css("visibility","hidden");
