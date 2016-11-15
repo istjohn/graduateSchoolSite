@@ -40,6 +40,8 @@ $(document).ready(function() {
         //add new school
         $("#btnAddSchool").on("click", function() {
             console.log("Pressed the add school button...");
+            $("#schoolTable").css('width','25%');
+            $("#schoolForm").css('width','75%');
             $("#schoolForm").css('visibility','visible');
         });
 
@@ -63,7 +65,9 @@ $(document).ready(function() {
             }
 
             console.log("Opening form to edit object:\n"+JSON.stringify(candidate));
-            //show the form
+            //show the form and collapse the table
+            $("#schoolTable").css('width','25%');
+            $("#schoolForm").css('width','75%');
             $("#schoolForm").css('visibility','visible');
 
             //tell the school to populate the visible form with its data
@@ -138,21 +142,21 @@ $(document).ready(function() {
             var reqType = reqGroup.next(".reqType");
             if(reqGroup.val() == "Document Requirement") {
                 console.log("Hide exp reqs and gen reqs");
-                reqType.find(".expreq").wrap("<span/>");
-                reqType.find(".genreq").wrap("<span/>");
-                reqType.find(".docreq").unwrap();
+                $(".reqType option[class='expreq']").css('visibility','hidden');
+                $(".reqType option[class='genreq']").css('visibility','hidden');
+                $(".reqType option[class='docreq']").css('visibility','visible');
                 reqType.val("Personal Statement");
             } else if(reqGroup.val() == "Experience Requirement") {
                 console.log("Hide doc reqs and gen reqs");
-                reqType.children(".docreq").wrap("<span/>");
-                reqType.children(".expreq").unwrap();
-                reqType.children(".genreq").wrap("<span/>");
+                $(".reqType option[class='docreq']").css('visibility','hidden');
+                $(".reqType option[class='expreq']").css('visibility','visible');
+                $(".reqType option[class='genreq']").css('visibility','hidden');
                 reqType.val("Volunteer Experience");
             } else {
                 console.log("Hide doc reqs and exp reqs");
-                reqType.children(".docreq").wrap("<span/>");
-                reqType.children(".expreq").wrap("<span/>");
-                reqType.children(".genreq").unwrap();
+                $(".reqType option[class='docreq']").css('visibility','hidden');
+                $(".reqType option[class='expreq']").css('visibility','hidden');
+                $(".reqType option[class='genreq']").css('visibility','visible');
                 reqType.val("Minimum GPA");
             }
         });
@@ -344,6 +348,8 @@ $(document).ready(function() {
         $(".reqSection").not(":first").remove();
         $(".linkSection").not(":first").remove();
         $("#schoolNotes").val("");
+        $("#schoolForm").css('width','25%');
+        $("#schoolTable").css('width','75%');
         location.reload();
     }
 
@@ -461,7 +467,7 @@ $(document).ready(function() {
             var root = $("#opRoot");
             var clone = root.clone();
             clone.removeProp('id');
-            root.append(clone);
+            $("#progOps").append(clone);
             clone.children(".opType").val(this.opType);
             clone.children(".opName").val(this.opName);
         };
@@ -476,23 +482,26 @@ $(document).ready(function() {
             var root = $("#reqRoot");
             var clone = root.clone();
             clone.removeProp('id');
-            root.append(clone);
+            $("#progReqs").append(clone);
             clone.children(".reqGroup").val(this.reqGroup);
             clone.children(".reqType").val(this.reqType);
             clone.children(".reqParam").val(this.reqParam);
 
             if(this.reqGroup == "Document Requirement") {
-                clone.find(".expreq").css("visibility","hidden");
-                clone.find(".genreq").css("visibility","hidden");
-                clone.find(".docreq").css("visibility","visible");
+                $(".reqType option[class='expreq']").css('visibility','hidden');
+                $(".reqType option[class='genreq']").css('visibility','hidden');
+                $(".reqType option[class='docreq']").css('visibility','visible');
+                reqType.val("Personal Statement");
             } else if(this.reqGroup == "Experience Requirement") {
-                clone.find(".docreq").css("visibility","hidden");
-                clone.find(".expreq").css("visibility","visible");
-                clone.find(".genreq").css("visibility","hidden");
+                $(".reqType option[class='docreq']").css('visibility','hidden');
+                $(".reqType option[class='expreq']").css('visibility','visible');
+                $(".reqType option[class='genreq']").css('visibility','hidden');
+                reqType.val("Volunteer Experience");
             } else {
-                clone.find(".docreq").css("visibility","hidden");
-                clone.find(".expreq").css("visibility","hidden");
-                clone.find(".genreq").css("visibility","visible");
+                $(".reqType option[class='docreq']").css('visibility','hidden');
+                $(".reqType option[class='expreq']").css('visibility','hidden');
+                $(".reqType option[class='genreq']").css('visibility','visible');
+                reqType.val("Minimum GPA");
             }
         };
     }

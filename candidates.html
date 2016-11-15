@@ -22,8 +22,10 @@
         <b>To edit or delete an existing school, double-click its "School Name" in the appropriate cell of the first column.</b>
     </details>
     <br><br>
-    <button id="btnAddSchool">Add New School Candidate</button>
-    <button id="btnDeleteAll">Delete All School Candidates</button>
+    <fieldset class="buttonSet">
+        <button id="btnAddSchool">Add New School Candidate</button>
+        <button id="btnDeleteAll">Delete All School Candidates</button>
+    </fieldset>
     <br><br>
     <div id="content">
         <table id="schoolTable">
@@ -99,12 +101,13 @@
                         <label>Option Name:</label>
                         <input class="opName" type="text">
                     </div>
-                    <br><br>
+                </fieldset>
+                <br><br>
+                <fieldset class="buttonSet">
                     <button id="btnAddOp">Add Program Option</button>
                     <button id="btnRemoveOp">Remove Last Program Option</button>
                 </fieldset>
                 <br><br>
-                <br>
                 <fieldset id="progReqs">
                     <legend>Program Requirements for Acceptance</legend>
                     <br>
@@ -138,7 +141,9 @@
                         <input class="reqParam" type="number" step="any">
                         <br>
                     </div>
-                    <br><br>
+                </fieldset>
+                <br><br>
+                <fieldset class="buttonSet">
                     <button id="btnAddReq">Add Requirement</button>
                     <button id="btnRemoveReq">Remove Last Requirement</button>
                 </fieldset>
@@ -153,8 +158,9 @@
                     <label>URL: <i>Copy & Paste the Page you want to use later</i></label>
                     <input type="url" class="linkUrl">
                 </div>
-
-                <br><br>
+            </fieldset>
+            <br><br>
+            <fieldset class="buttonSet">
                 <button id="btnAddSchoolLink">Add Link</button>
                 <button id="btnRemoveSchoolLink">Remove Last Link</button>
             </fieldset>
@@ -163,9 +169,11 @@
                 <label for="schoolNotes">Additional Notes</label>
                 <textarea id="schoolNotes"></textarea>
             </fieldset>
-            <button id="btnSave">Save</button>
-            <button id="btnCancel">Cancel</button>
-            <button id="btnDelete">Delete</button>
+            <fieldset class="buttonSet">
+                <button id="btnSave">Save</button>
+                <button id="btnCancel">Cancel</button>
+                <button id="btnDelete">Delete</button>
+            </fieldset>
         </div>
     </div>
     <br><br>
