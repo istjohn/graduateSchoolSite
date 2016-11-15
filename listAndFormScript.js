@@ -32,8 +32,9 @@ $(document).ready(function() {
 
     //add requirement
     $("#btnAddReq").on("click", function() {
-        var orig = $(".reqSection:last");
+        var orig = $("#reqRoot");
         var clone = orig.clone();
+        clone.removeProp('id');
         orig.append($("<br>"));
         orig.append(clone);
     });
@@ -48,6 +49,7 @@ $(document).ready(function() {
     $("#btnAddOp").on("click", function() {
         var orig = $("#opRoot");
         var clone = orig.clone();
+        clone.removeProp('id');
         orig.append($("<br>"));
         orig.append(clone);
     });
@@ -55,6 +57,20 @@ $(document).ready(function() {
     $("#btnRemoveOp").on("click", function() {
         var orig = $(".opSection:last");
         orig.remove();
+    });
+
+    //add school link
+    $("#btnAddSchoolLink").on("click", function() {
+        var orig = $("#linkRoot");
+        var clone = orig.clone();
+        clone.removeProp('id');
+        orig.append($("<br>"));
+        orig.append(clone);
+    });
+
+    //remove school link
+    $("#btnRemoveSchoolLink").on("click", function() {
+       $(".linkSection:last").remove();
     });
 
     //update available req types based on selected req group
@@ -98,11 +114,14 @@ $(document).ready(function() {
 
         var links = [];
         $(".linkSection").each(function() {
-            console.log("school link val = " + $(".schoolLink").val());
-            links.push($(".schoolLink").val());
+            var d = $(this).children(".linkDisplayName").val();
+            var l = $(this).children(".linkUrl").val();
+            links.push(new SchoolLink(d, l));
         });
 
-        console.log("reqs : " + reqs.length);
+        console.log("num reqs : " + reqs.length);
+        console.log("num ops : " + ops.length);
+        console.log("num links : " + links.length);
 
         var key = $("#schoolName").val();
         var school = new School(
@@ -120,7 +139,8 @@ $(document).ready(function() {
                 ops,
                 reqs
             ),
-            links
+            links,
+            $("#schoolNotes").text()
         );
 
         var jsonschool = JSON.stringify(school);
@@ -177,13 +197,24 @@ $(document).ready(function() {
                 reqs.push(new ProgReq(rawreq['reqGroup'],rawreq['reqType'],rawreq['reqParam']));
             });
 
+            var rawlinks = jsonObj['schoolLinks'];
+            var links = [];
+            if(rawlinks && rawlinks.length) {
+                $.each(rawlinks, function (ind, rawlink) {
+                    console.log(rawlink['linkDisplayName']);
+                    console.log(rawlink['linkUrl']);
+                    links.push(new SchoolLink(rawlink['linkDisplayName'],rawlink['linkUrl']));
+                });
+            }
+
             var school = new School(
                 jsonObj["schoolName"],jsonObj["schoolState"],jsonObj["appDueDate"],jsonObj["appFee"],
                 new Program(rawprog['degree'],rawprog['progLen'],rawprog['creds'],rawprog['costPerCred'],
                     rawprog['costPerSem'],rawprog['costPerYear'],
                     ops,
                     reqs),
-                jsonObj['schoolLinks']
+                links,
+                jsonObj['schoolNotes']
             );
 
             if(school instanceof School) {
@@ -211,14 +242,19 @@ $(document).ready(function() {
            });
 
            var links = $("<ul class='schoolLinkList'>");
-           $.each(candidate.schoolLinks, function(ind, link) {
-               var ah = $("<a>");
-               ah.prop('href',link);
-               ah.prop('target','_blank');
-               ah.text(link);
-              links.append($("<li>")
-                  .append(ah));
-           });
+           if(candidate.schoolLinks.length > 0) {
+               $.each(candidate.schoolLinks, function(ind, link) {
+                   var ah = $("<a>").text(link.linkDisplayName);
+                   ah.prop('href',link.linkUrl);
+                   ah.prop('target','_blank');
+                   links.append($("<li>")
+                       .append(ah));
+               });
+           } else {
+               links = $("<p>").text("N/A");
+               links.css('text-align','center');
+           }
+
 
             $("#schoolTable").append($("<tr>")
                 .append($("<td class='editable'>").text(candidate.schoolName))
@@ -239,7 +275,10 @@ $(document).ready(function() {
                         )
                     )
                 )
-                .append(links)
+                .append($("<td>")
+                    .append(links))
+                .append($("<td>")
+                    .append($("<pre>").text(candidate.schoolNotes)))
             );
         });
     } else {
@@ -282,17 +321,19 @@ $(document).ready(function() {
         $(".opSection").not(":first").remove();
         $(".reqSection").not(":first").remove();
         $(".linkSection").not(":first").remove();
+        $("#schoolNotes").val("...");
     }
 
     /** GraduateSchool candidate object constructor
      * params: school's name, state it's in, application due date and fee, and the program of interest*/
-    function School(schoolName, schoolState, appDueDate, appFee, prog, links) {
+    function School(schoolName, schoolState, appDueDate, appFee, prog, links, notes) {
         this.schoolName = schoolName;
         this.schoolState = schoolState;
         this.appDueDate = appDueDate;
         this.appFee = appFee;
         this.prog = prog;
         this.schoolLinks = [];
+        this.schoolNotes = notes;
         if(links instanceof Array) {
             this.schoolLinks = links.slice();
         }
@@ -301,18 +342,17 @@ $(document).ready(function() {
             $("#schoolState").val(this.schoolState);
             $("#appDueDate").val(this.appDueDate);
             $("#appFee").val(this.appFee);
-            if(this.schoolLinks.length == 0) {
-                $(".linkSection").not(":first").remove();
-            } else if(this.schoolLinks.length ==1) {
-                $("#linkRoot").val(this.schoolLinks[0]);
-            } else {
-                $.each(this.schoolLinks, function(ind, link){
-                   var clone = $("#linkRoot").clone();
-                    clone.removeProp('id');
-                    $("#linkRoot").append(clone);
-                    var i = ind+1;
-                    $("#links").children("div:nth-of-type("+i+")").children(".schoolLink").val(link);
-                });
+            $.each(this.schoolLinks, function(ind, link){
+                if(ind > 0 ) {
+                    link.populateSchoolLinkData();
+                } else {
+                    var root = $("#linkRoot");
+                    root.children(".linkDisplayName").val(this.linkDisplayName);
+                    root.children(".linkUrl").val(this.linkUrl);
+                }
+            });
+            if(this.schoolNotes) {
+                $("#schoolNotes").text(this.schoolNotes);
             }
             this.prog.populateProgramFormData();
         };
@@ -367,35 +407,26 @@ $(document).ready(function() {
             $("#costPerCred").val(parseFloat(this.costPerCred).toFixed(2));
             $("#costPerSem").val(parseFloat(this.costPerSem).toFixed(2));
             $("#costPerYear").val(parseFloat(this.costPerYear).toFixed(2));
+            $.each(this.progReqs, function(ind, req) {
+                if(ind > 0) {
+                    req.populateProgReqFormData();
+                } else {
+                    var root = $("#reqRoot");
+                    root.children(".reqGroup").val(req.reqGroup);
+                    root.children(".reqType").val(req.reqType);
+                    root.children(".reqParam").val(req.reqParam);
+                }
+            });
 
-            if(this.progOps.length == 0) {
-                $("#opRoot").remove();
-            } else if(this.progOps.length == 1) {
-                this.progOps[0].populateProgOpFormData(1);
-            } else {
-                this.progOps[0].populateProgOpFormData(1);
-                var root = $("#opRoot");
-                $.each(this.progOps.slice(1), function(ind, op) {
-                    var clone = root.clone();
-                    clone.remove('id');
-                    op.populateProgOpFormData(ind+1);
-                });
-            }
-
-            if(this.progReqs.length == 0) {
-                $("#reqRoot").remove();
-            } else if(this.progReqs.length == 1) {
-                this.progReqs[0].populateProgReqFormData(1);
-            } else {
-                this.progReqs[0].populateProgReqFormData(1);
-                var root = $("#reqRoot");
-                $.each(this.progReqs.slice(1), function(ind, op) {
-                    var clone = root.clone();
-                    clone.remove('id');
-                    op.populateProgReqFormData(ind+1);
-                });
-            }
-
+            $.each(this.progOps, function(ind, op) {
+                if(ind > 0) {
+                    op.populateProgOpFormData();
+                } else {
+                    var root = $("#opRoot");
+                    root.children(".opType").val(op.opType);
+                    root.children(".opName").val(op.opName);
+                }
+            });
         };
     }
 
@@ -403,9 +434,13 @@ $(document).ready(function() {
     function ProgOp(opType, opName) {
         this.opType = opType;
         this.opName = opName;
-        this.populateProgOpFormData = function (ind) {
-            $("div:nth-of-type("+ind+")").children(".opType").val(this.opType);
-            $("div:nth-of-type("+ind+")").children(".opName").val(this.opName);
+        this.populateProgOpFormData = function () {
+            var root = $("#opRoot");
+            var clone = root.clone();
+            clone.removeProp('id');
+            root.append(clone);
+            clone.children(".opType").val(this.opType);
+            clone.children(".opName").val(this.opName);
         };
     }
 
@@ -414,23 +449,42 @@ $(document).ready(function() {
         this.reqGroup = reqGroup;
         this.reqType = reqType;
         this.reqParam = reqParam;
-        this.populateProgReqFormData = function(ind) {
-            $("div:nth-of-type("+ind+")").children(".reqGroup").val(this.reqGroup);
-            $("div:nth-of-type("+ind+")").children(".reqType").val(this.reqType);
-            $("div:nth-of-type("+ind+")").children(".reqParam").val(this.reqParam);
+        this.populateProgReqFormData = function() {
+            var root = $("#reqRoot");
+            var clone = root.clone();
+            clone.removeProp('id');
+            root.append(clone);
+            clone.children(".reqGroup").val(this.reqGroup);
+            clone.children(".reqType").val(this.reqType);
+            clone.children(".reqParam").val(this.reqParam);
+
             if(this.reqGroup == "Document Requirement") {
-                $("option:nth-of-type("+ind+")").children(".expreq").css("visibility","hidden");
-                $("option:nth-of-type("+ind+")").children(".genreq").css("visibility","hidden");
-                $("option:nth-of-type("+ind+")").children(".docreq").css("visibility","visible");
+                clone.find(".expreq").css("visibility","hidden");
+                clone.find(".genreq").css("visibility","hidden");
+                clone.find(".docreq").css("visibility","visible");
             } else if(this.reqGroup == "Experience Requirement") {
-                $("option:nth-of-type("+ind+")").children(".docreq").css("visibility","hidden");
-                $("option:nth-of-type("+ind+")").children(".expreq").css("visibility","visible");
-                $("option:nth-of-type("+ind+")").children(".genreq").css("visibility","hidden");
+                clone.find(".docreq").css("visibility","hidden");
+                clone.find(".expreq").css("visibility","visible");
+                clone.find(".genreq").css("visibility","hidden");
             } else {
-                $("option:nth-of-type("+ind+")").children(".docreq").css("visibility","hidden");
-                $("option:nth-of-type("+ind+")").children(".expreq").css("visibility","hidden");
-                $("option:nth-of-type("+ind+")").children(".genreq").css("visibility","visible");
+                clone.find(".docreq").css("visibility","hidden");
+                clone.find(".expreq").css("visibility","hidden");
+                clone.find(".genreq").css("visibility","visible");
             }
-        }
+        };
+    }
+
+    /** Extra School links */
+    function SchoolLink(linkDisplayName, linkUrl) {
+        this.linkDisplayName = linkDisplayName;
+        this.linkUrl = linkUrl;
+        this.populateSchoolLinkData = function() {
+            var root = $("#linkRoot");
+            var clone = root.clone();
+            clone.removeProp('id');
+            root.append(clone);
+            clone.children(".linkDisplayName").val(this.linkDisplayName);
+            clone.children(".linkUrl").val(this.linkUrl);
+        };
     }
 });

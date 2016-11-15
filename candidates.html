@@ -34,6 +34,7 @@
                 <td>Application Fee</td>
                 <td>Program of Interest</td>
                 <td>Reference Links</td>
+                <td>Additional Notes</td>
             </tr>
         </table>
         <div id="schoolForm">
@@ -145,11 +146,21 @@
             <br><br>
             <fieldset id="links">
                 <legend>School Links</legend>
-                <div class="linkSection" id="linkRoot"></div>
-                <label>URL: <i>Copy & Paste the Page you want to use later</i></label>
-                <input type="url" class="schoolLink">
+                <div class="linkSection" id="linkRoot">
+                    <label>Link Display Name: <i>(What will be displayed in the table)</i></label>
+                    <input type="text" class="linkDisplayName">
+                    <label>URL: <i>Copy & Paste the Page you want to use later</i></label>
+                    <input type="url" class="linkUrl">
+                </div>
+
                 <br><br>
-                <button id="btnAddLink">Add Link</button>
+                <button id="btnAddSchoolLink">Add Link</button>
+                <button id="btnRemoveSchoolLink">Remove Last Link</button>
+            </fieldset>
+            <fieldset>
+                <legend>Extra Notes</legend>
+                <label for="schoolNotes">Additional Notes</label>
+                <textarea id="schoolNotes">...</textarea>
             </fieldset>
             <button id="btnSave">Save</button>
             <button id="btnCancel">Cancel</button>
