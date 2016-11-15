@@ -12,7 +12,8 @@
 td {
     display:table-cell;
     border:solid 1px black;
-    margin:5px;
+    margin:20px 20px;
+    width:auto;
 }
 
 #schoolTable {
@@ -50,7 +51,9 @@ td {
     border:1px solid darkgreen;
     border-radius:5px;
     width:250px;
-    background-color:lightgray;;
+    background-color:lightgray;
+    margin:15px 0;
+    clear:both;
 }
 
 .reqSection {
@@ -58,6 +61,17 @@ td {
     border-radius:5px;
     width:250px;
     background-color:lightgray;
+    margin:15px 0;
+    clear:both;
+}
+
+.linkSection {
+    border:1px solid orangered;
+    border-radius:5px;
+    width:inherit;
+    background-color:lightgray;
+    margin:15px 0;
+    clear:both;
 }
 
 .editable {

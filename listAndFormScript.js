@@ -12,175 +12,214 @@ $(document).ready(function() {
     if(typeof(Storage) == "undefined") {
         alert("There is no local storage available in this browser. Exiting");
         $(document).close();
+    } else {
+        //There is valid local storage, check if anything is stored there
+        if(localStorage.length > 0) {
+            //if so, retrieve the stored candidates and then populate the table
+            console.log("local storage length = "+localStorage.length);
+            parseCandidatesFromStorage();
+            populateTable();
+        } else {
+            //focus on the add button
+            $('#btnAddSchool').focus();
+        }
+        //regardless of whether or not there are existing candidates, we want to activate
+        //this page's interactivity with handlers...
+        assignAllEventHandlers();
     }
 
-    //attach handlers to the buttons on the list page
-    //add new school
-    $("#btnAddSchool").on("click", function() {
-        console.log("Pressed the add school button...");
-        $("#schoolForm").css('visibility','visible');
-    });
+    /** Assigns ALL event handlers to HTML entities on the page (both the table, and the form) */
+    function assignAllEventHandlers() {
+        assignFormEventHandlers();
+        assignTableEventHandlers();
+    }
 
-    //delete ALL schools
-    $("#btnDeleteAll").on("click", function() {
-        var r = confirm("Are you sure you wish to delete all records?");
-        if(r == true && localStorage.length > 0) {
-            localStorage.clear();
-            reload();
-        }
-    });
-
-    //add requirement
-    $("#btnAddReq").on("click", function() {
-        var orig = $("#reqRoot");
-        var clone = orig.clone();
-        clone.removeProp('id');
-        orig.append($("<br>"));
-        orig.append(clone);
-    });
-
-    //remove requirement
-    $("#btnRemoveReq").on("click", function() {
-        var orig = $(".reqSection:last");
-        orig.remove();
-    });
-
-    //add op
-    $("#btnAddOp").on("click", function() {
-        var orig = $("#opRoot");
-        var clone = orig.clone();
-        clone.removeProp('id');
-        orig.append($("<br>"));
-        orig.append(clone);
-    });
-    //remove op
-    $("#btnRemoveOp").on("click", function() {
-        var orig = $(".opSection:last");
-        orig.remove();
-    });
-
-    //add school link
-    $("#btnAddSchoolLink").on("click", function() {
-        var orig = $("#linkRoot");
-        var clone = orig.clone();
-        clone.removeProp('id');
-        orig.append($("<br>"));
-        orig.append(clone);
-    });
-
-    //remove school link
-    $("#btnRemoveSchoolLink").on("click", function() {
-       $(".linkSection:last").remove();
-    });
-
-    //update available req types based on selected req group
-    $("#progReqs").on("change", ".reqGroup", function(ind) {
-        var i = ind + 1;
-        var reqGroup = $(this).children("select:nth-of-type("+i+")");
-        if(reqGroup == "Document Requirement") {
-            reqGroup.children(".expreq").css("visibility","hidden");
-            reqGroup.children(".genreq").css("visibility","hidden");
-            reqGroup.children(".docreq").css("visibility","visible");
-            reqGroup.children(".reqType").val("Personal Statement");
-        } else if(reqGroup == "Experience Requirement") {
-            reqGroup.children(".docreq").css("visibility","hidden");
-            reqGroup.children(".expreq").css("visibility","visible");
-            reqGroup.children(".genreq").css("visibility","hidden");
-            reqGroup.children(".reqType").val("Volunteer Experience");
-        } else {
-            reqGroup.children(".docreq").css("visibility","hidden");
-            reqGroup.children(".expreq").css("visibility","hidden");
-            reqGroup.children(".genreq").css("visibility","visible");
-            reqGroup.children(".reqType").val("Minimum GPA");
-        }
-    });
-
-    //save/create -- performed whenever the save button is pressed, for a edited or new entry
-    $("#btnSave").on("click", function() {
-        var ops = [];
-        $(".opSection").each(function() {
-            var otype = $(this).children(".opType").val();
-            var oname = $(this).children(".opName").val();
-            ops.push(new ProgOp(otype, oname));
+    /** Assign all necessary event handlers to any and all table elements */
+    function assignTableEventHandlers() {
+        //attach handlers to the buttons on the list page
+        //add new school
+        $("#btnAddSchool").on("click", function() {
+            console.log("Pressed the add school button...");
+            $("#schoolForm").css('visibility','visible');
         });
 
-        var reqs = [];
-        $(".reqSection").each(function() {
-            var g = $(this).children(".reqGroup").val();
-            var t = $(this).children(".reqType").val();
-            var p = $(this).children(".reqParam").val();
-            reqs.push(new ProgReq(g, t, p));
+        //delete ALL schools
+        $("#btnDeleteAll").on("click", function() {
+            var r = confirm("Are you sure you wish to delete all records?");
+            if(r == true && localStorage.length > 0) {
+                localStorage.clear();
+                reload();
+            }
         });
 
-        var links = [];
-        $(".linkSection").each(function() {
-            var d = $(this).children(".linkDisplayName").val();
-            var l = $(this).children(".linkUrl").val();
-            links.push(new SchoolLink(d, l));
+        //edit school
+        $('#schoolTable').on('dblclick', '.editable', function() {
+            var key = $(event.target).text();
+            var candidate;
+            for(var i = 0; i < candidates.length; i++) {
+                if(candidates[i].schoolName == key) {
+                    candidate = candidates[i];
+                }
+            }
+
+            console.log("Opening form to edit object:\n"+JSON.stringify(candidate));
+            //show the form
+            $("#schoolForm").css('visibility','visible');
+
+            //tell the school to populate the visible form with its data
+            candidate.populateSchoolFormData();
+        });
+    }
+
+    /** Assign all necessary event handlers to any and all form elements */
+    function assignFormEventHandlers() {
+        //cancel
+        $("#btnCancel").on('click', function(){
+            console.log("school addition cancelled");
+            $("#schoolForm").css('visibility','hidden');
+            clearForm();
         });
 
-        console.log("num reqs : " + reqs.length);
-        console.log("num ops : " + ops.length);
-        console.log("num links : " + links.length);
+        //delete
+        $("#btnDelete").on("click", function() {
+            var key = $("#schoolName");
+            localStorage.removeItem(key);
+            $("#schoolForm").css('visibility','hidden');
+            clearForm();
+        });
 
-        var key = $("#schoolName").val();
-        var school = new School(
-            key,
-            $("#schoolState").val(),
-            $("#appDueDate").val(),
-            $("#appFee").val(),
-            new Program(
-                $("#degree").val(),
-                $("#progLen").val(),
-                $("#creds").val(),
-                $("#costPerCred").val(),
-                $("#costPerSem").val(),
-                $("#costPerYear").val(),
-                ops,
-                reqs
-            ),
-            links,
-            $("#schoolNotes").text()
-        );
+        //add requirement
+        $("#btnAddReq").on("click", function() {
+            var orig = $("#reqRoot");
+            var clone = orig.clone();
+            clone.removeProp('id');
+            orig.append($("<br>"));
+            $("#progReqs").append(clone);
+        });
 
-        var jsonschool = JSON.stringify(school);
+        //remove requirement
+        $("#btnRemoveReq").on("click", function() {
+            var orig = $(".reqSection:last");
+            orig.remove();
+        });
 
-        localStorage.setItem(key, jsonschool);
-        $("#schoolForm").css("visibility","hidden");
-        clearForm();
-    });
+        //add op
+        $("#btnAddOp").on("click", function() {
+            var orig = $("#opRoot");
+            var clone = orig.clone();
+            clone.removeProp('id');
+            orig.append($("<br>"));
+            $("#progOps").append(clone);
+        });
+        //remove op
+        $("#btnRemoveOp").on("click", function() {
+            var orig = $(".opSection:last");
+            orig.remove();
+        });
 
-    //cancel
-    $("#btnCancel").on('click', function(){
-       console.log("school addition cancelled");
-       $("#schoolForm").css('visibility','hidden');
-       clearForm();
-    });
+        //add school link
+        $("#btnAddSchoolLink").on("click", function() {
+            var orig = $("#linkRoot");
+            var clone = orig.clone();
+            clone.removeProp('id');
+            orig.append($("<br>"));
+            $("#links").after()
+        });
 
-    //delete
-    $("#btnDelete").on("click", function() {
-        var key = $("#schoolName");
-        localStorage.removeItem(key);
-        $("#schoolForm").css('visibility','hidden');
-        clearForm();
-    });
+        //remove school link
+        $("#btnRemoveSchoolLink").on("click", function() {
+            $(".linkSection:last").remove();
+        });
 
-    $("#btnAddLink").on("click", function() {
-        var clone = $("#linkRoot").clone();
-        clone.removeProp('id');
-        clone.val("");
-        $("#linkRoot").append(clone);
-    });
+        //update available req types based on selected req group
+        $(".reqSection").on("change", ".reqGroup", function() {
+            var reqGroup = $(this);
+            console.log("Selected requirement group set to: " + reqGroup.val());
+            var reqType = reqGroup.next(".reqType");
+            if(reqGroup.val() == "Document Requirement") {
+                console.log("Hide exp reqs and gen reqs");
+                reqType.find(".expreq").wrap("<span/>");
+                reqType.find(".genreq").wrap("<span/>");
+                reqType.find(".docreq").unwrap();
+                reqType.val("Personal Statement");
+            } else if(reqGroup.val() == "Experience Requirement") {
+                console.log("Hide doc reqs and gen reqs");
+                reqType.children(".docreq").wrap("<span/>");
+                reqType.children(".expreq").unwrap();
+                reqType.children(".genreq").wrap("<span/>");
+                reqType.val("Volunteer Experience");
+            } else {
+                console.log("Hide doc reqs and exp reqs");
+                reqType.children(".docreq").wrap("<span/>");
+                reqType.children(".expreq").wrap("<span/>");
+                reqType.children(".genreq").unwrap();
+                reqType.val("Minimum GPA");
+            }
+        });
 
-    //if there are candidates in storage, load them and parse them into objects
-    if(localStorage.length > 0) {
-        console.log("Candidates in storage: " + localStorage.length);
-        console.log("Retrieving candidates from storage...");
+        //save/create -- performed whenever the save button is pressed, for a edited or new entry
+        $("#btnSave").on("click", function() {
+            var ops = [];
+            $(".opSection").each(function() {
+                var otype = $(this).children(".opType").val();
+                var oname = $(this).children(".opName").val();
+                ops.push(new ProgOp(otype, oname));
+            });
+
+            var reqs = [];
+            $(".reqSection").each(function() {
+                var g = $(this).children(".reqGroup").val();
+                var t = $(this).children(".reqType").val();
+                var p = $(this).children(".reqParam").val();
+                reqs.push(new ProgReq(g, t, p));
+            });
+
+            var links = [];
+            $(".linkSection").each(function() {
+                var d = $(this).children(".linkDisplayName").val();
+                var l = $(this).children(".linkUrl").val();
+                links.push(new SchoolLink(d, l));
+            });
+
+            console.log("num reqs : " + reqs.length);
+            console.log("num ops : " + ops.length);
+            console.log("num links : " + links.length);
+
+            var key = $("#schoolName").val();
+            var school = new School(
+                key,
+                $("#schoolState").val(),
+                $("#appDueDate").val(),
+                $("#appFee").val(),
+                new Program(
+                    $("#degree").val(),
+                    $("#progLen").val(),
+                    $("#creds").val(),
+                    $("#costPerCred").val(),
+                    $("#costPerSem").val(),
+                    $("#costPerYear").val(),
+                    ops,
+                    reqs
+                ),
+                links,
+                $("#schoolNotes").val()
+            );
+
+            var jsonschool = JSON.stringify(school);
+
+            localStorage.setItem(key, jsonschool);
+            $("#schoolForm").css("visibility","hidden");
+            clearForm();
+        });
+    }
+
+    function parseCandidatesFromStorage() {
+        //if there are candidates in storage, load them and parse them into objects
         for(var i = 0; i < localStorage.length; i++) {
             var k = localStorage.key(i);
             console.log("At index["+i+"] key = '"+k+"'.");
             var jsonCandidate = localStorage.getItem(k);
-            console.log("JSON with with key:\n" + jsonCandidate);
+            console.log("JSON object associated with that key:\n" + jsonCandidate);
             var jsonObj = JSON.parse(jsonCandidate);
 
             var rawprog = jsonObj['prog'];
@@ -188,7 +227,7 @@ $(document).ready(function() {
             var rawops = rawprog['progOps'];
             var ops = [];
             $.each(rawops, function(ind, rawop){
-               ops.push(new ProgOp(rawop['opType'],rawop['opName']));
+                ops.push(new ProgOp(rawop['opType'],rawop['opName']));
             });
 
             var rawreqs = rawprog['progReqs'];
@@ -201,8 +240,6 @@ $(document).ready(function() {
             var links = [];
             if(rawlinks && rawlinks.length) {
                 $.each(rawlinks, function (ind, rawlink) {
-                    console.log(rawlink['linkDisplayName']);
-                    console.log(rawlink['linkUrl']);
                     links.push(new SchoolLink(rawlink['linkDisplayName'],rawlink['linkUrl']));
                 });
             }
@@ -222,87 +259,72 @@ $(document).ready(function() {
             } else {
                 console.log("Failed to parse JSON object into a School!");
             }
-
             candidates.push(school);
         }
     }
 
-    //populate the table if there are candidates to fill it
-    if(candidates.length > 0) {
-       $.each(candidates, function(ind, candidate) {
-           var prog = candidate.prog;
-           var ops = $("<ul class='progOpsList'>");
-           $.each(prog.progOps, function(ind, op) {
-               ops.append($("<li>").text(op.opType + " : " + op.opName));
-           });
+    /** Fills the table with all persisted school candidates -- if there are any. Else, prints an alert message. */
+    function populateTable() {
+        //populate the table if there are candidates to fill it
+        if(candidates.length > 0) {
+            $.each(candidates, function(ind, candidate) {
+                var prog = candidate.prog;
+                var ops = $("<ul class='progOpsList'>");
+                $.each(prog.progOps, function(ind, op) {
+                    ops.append($("<li>").text(op.opType + " : " + op.opName));
+                });
 
-           var reqs = $("<ul class='progReqsList'>");
-           $.each(prog.progReqs, function(ind, req) {
-               reqs.append($("<li>").text("["+req.reqGroup+"] : "+req.reqParam + " " + req.reqType));
-           });
+                var reqs = $("<ul class='progReqsList'>");
+                $.each(prog.progReqs, function(ind, req) {
+                    reqs.append($("<li>").text("["+req.reqGroup+"] : "+req.reqParam + " " + req.reqType));
+                });
 
-           var links = $("<ul class='schoolLinkList'>");
-           if(candidate.schoolLinks.length > 0) {
-               $.each(candidate.schoolLinks, function(ind, link) {
-                   var ah = $("<a>").text(link.linkDisplayName);
-                   ah.prop('href',link.linkUrl);
-                   ah.prop('target','_blank');
-                   links.append($("<li>")
-                       .append(ah));
-               });
-           } else {
-               links = $("<p>").text("N/A");
-               links.css('text-align','center');
-           }
+                var links = $("<ul class='schoolLinkList'>");
+                if(candidate.schoolLinks.length > 0) {
+                    $.each(candidate.schoolLinks, function(ind, link) {
+                        var ah = $("<a>").text(link.linkDisplayName);
+                        ah.prop('href',link.linkUrl);
+                        ah.prop('target','_blank');
+                        links.append($("<li>")
+                            .append(ah));
+                    });
+                } else {
+                    links = $("<p>").text("N/A");
+                    links.css('text-align','center');
+                }
 
 
-            $("#schoolTable").append($("<tr>")
-                .append($("<td class='editable'>").text(candidate.schoolName))
-                .append($("<td>").text(candidate.schoolState))
-                .append($("<td>").text(candidate.appDueDate))
-                .append($("<td>").text(candidate.appFee))
-                .append($("<td>")
-                    .append($("<details>")
-                        .append($("<summary>").text("Degree:"+prog.degree))
-                        .append($("<p>").text("Credits to Complete:"+prog.creds))
-                        .append($("<p>").text("Program Length:"+prog.progLen))
-                        .append($("<p>").text("Cost per Credit: $"+prog.costPerCred))
-                        .append($("<p>").text("Cost per Semester: $"+prog.costPerSem))
-                        .append($("<p>").text("Cost per Academic Year: $"+prog.costPerYear))
-                        .append($("<div>")
-                            .append(ops)
-                            .append(reqs)
+                $("#schoolTable").append($("<tr>")
+                    .append($("<td class='editable'>").text(candidate.schoolName))
+                    .append($("<td>").text(candidate.schoolState))
+                    .append($("<td>").text(candidate.appDueDate))
+                    .append($("<td>").text(candidate.appFee))
+                    .append($("<td>")
+                        .append($("<details>")
+                            .append($("<summary>").text("Degree:"+prog.degree))
+                            .append($("<p>").text("Credits to Complete:"+prog.creds))
+                            .append($("<p>").text("Program Length:"+prog.progLen))
+                            .append($("<p>").text("Cost per Credit: $"+prog.costPerCred))
+                            .append($("<p>").text("Cost per Semester: $"+prog.costPerSem))
+                            .append($("<p>").text("Cost per Academic Year: $"+prog.costPerYear))
+                            .append($("<div>")
+                                .append(ops)
+                                .append(reqs)
+                            )
                         )
                     )
-                )
-                .append($("<td>")
-                    .append(links))
-                .append($("<td>")
-                    .append($("<pre>").text(candidate.schoolNotes)))
-            );
-        });
-    } else {
-        alert("No school candidates have been added yet. Click on the 'Add New School' button below to add one.");
+                    .append($("<td>")
+                        .append(links))
+                    .append($("<td>")
+                        .append($("<pre>").text(candidate.schoolNotes)))
+                );
+            });
+        } else {
+            alert("No school candidates have been added yet. Click on the 'Add New School' button below to add one.");
+        }
     }
 
-    //edit school
-    $('#schoolTable').on('dblclick', '.editable', function() {
-        var key = $(event.target).text();
-        var candidate;
-        for(var i = 0; i < candidates.length; i++) {
-            if(candidates[i].schoolName == key) {
-                candidate = candidates[i];
-            }
-        }
-
-        console.log("Opening form to edit object:\n"+JSON.stringify(candidate));
-        //show the form
-        $("#schoolForm").css('visibility','visible');
-
-        //tell the school to populate the visible form with its data
-        candidate.populateSchoolFormData();
-    });
-
+    /** Re-initializes/clears all  */
     function clearForm() {
         $("#schoolName").val("");
         $("#schoolState").val("New York");
@@ -321,7 +343,8 @@ $(document).ready(function() {
         $(".opSection").not(":first").remove();
         $(".reqSection").not(":first").remove();
         $(".linkSection").not(":first").remove();
-        $("#schoolNotes").val("...");
+        $("#schoolNotes").val("");
+        location.reload();
     }
 
     /** GraduateSchool candidate object constructor
