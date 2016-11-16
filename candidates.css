@@ -236,3 +236,9 @@ select:not(#degree) {
 input[type='url'] {
     width:90%;
 }
+
+legend {
+		font-size:16pt;
+		text-decoration:underline;
+		font-weight:bold;
+}

@@ -50,7 +50,7 @@ $(document).ready(function() {
             var r = confirm("Are you sure you wish to delete all records?");
             if(r == true && localStorage.length > 0) {
                 localStorage.clear();
-                reload();
+                clearForm();
             }
         });
 
@@ -297,9 +297,7 @@ $(document).ready(function() {
 
 
                 $("#schoolTable").append($("<tr>")
-                    .append($("<td class='editable'>")
-                        .append()
-                        .text(candidate.schoolName))
+                    .append($("<td class='editable'>").text(candidate.schoolName))
                     .append($("<td>").text(candidate.schoolState))
                     .append($("<td>").text(candidate.appDueDate))
                     .append($("<td>").text(candidate.appFee))
