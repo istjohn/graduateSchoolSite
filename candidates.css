@@ -1,3 +1,119 @@
+/* ---------------------------------------- */
+/* GLOBAL ELEMENTS STYLING */
+/* ---------------------------------------- */
+h1 {
+    text-decoration:underline;
+    font-weight:bolder;
+    text-align: center;
+    color:rebeccapurple;
+}
+
+/*h1:h*/
+
+.btn {
+    background-color:green;
+    border:1px solid white;
+    color:black;
+    padding: 8px 16px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 13px;
+    max-width:135px;
+    cursor:pointer;
+}
+
+a:link {
+    color:dodgerblue;
+    text-decoration:underline;
+    text-decoration: wavy;
+}
+
+/* visited link */
+a:visited {
+    color:seagreen;
+    text-decoration-style: dotted;
+    text-decoration: underline;
+}
+
+/* mouse over link */
+a:hover {
+    color: darkblue;
+    font-size:110%;
+    text-decoration:underline;
+}
+
+/* selected link */
+a:active {
+    color: darkgreen;
+}
+
+/* TOOLTIPS */
+.hasTooltip {
+    position: relative;
+    display: inline-block;
+}
+
+.hasTooltip:hover .tooltip {
+    visibility: visible;
+    cursor:help;
+}
+
+.hasTooltip .tooltip {
+    visibility:hidden;
+    width:200px;
+    color:white;
+    background-color: dimgray;
+    text-align: left;
+    border-radius:3px;
+    padding:5px 0;
+    position: absolute;
+    z-index: 1;
+    bottom:100%;
+    left:50%;
+    margin-left:-60px;
+}
+
+/* DROPDOWN MENUS */
+.dropdownRoot {
+    background-color:deeppink;
+    color:black;
+    padding:20px;
+    font-size:15px;
+    border:1px dashed purple;
+    cursor: crosshair;
+}
+
+.dropdownMenu {
+    position: relative;
+    display: inline-block;
+}
+
+.dropdownMenu:hover .dropdownOptions {
+    display:block;
+}
+
+.dropdownMenu:hover .dropdownRoot {
+    background-color: aqua;
+}
+
+.dropdownOptions {
+    display: none;
+    position: absolute;
+    background-color: aliceblue;
+    min-width: 120px;
+    box-shadow:0 8px 16px 0 rgba(0,0,0,0.2);
+}
+
+/* insert .dropdownOptions ELEMENT_INSIDE:hover... */
+
+.dropdownOptions .btn:hover {
+
+}
+
+/* ---------------------------------------- */
+/* TABLE ELEMENTS STYLING */
+/* ---------------------------------------- */
 .headerRow {
     display:table-row;
     text-align:center;
@@ -9,41 +125,53 @@
     color:ghostwhite;
 }
 
-fieldset {
-    border:double 1px darkslategray;
-}
-
-.buttonSet {
-    border:ridge 2px rebeccapurple;
-    width:450px;
-    background-color:darkslategray;
-}
-
-.buttonSet > button {
-    display:inline-block;
-    margin:0 20px;
+.headerRow td {
+    height:35px;
+    background-color: dimgray;
 }
 
 td {
     display:table-cell;
     border:solid 1px black;
     margin:20px 20px;
+    text-align:center;
 }
 
 #schoolTable {
     display:table;
     border: solid 2px darkviolet;
     float:left;
-    width:75%;
+    width:90%;
+    border-collapse: collapse;
+    table-layout: auto;
 }
 
-.progOpsList {
-    float:left;
+#schoolTable:nth-child(even) {
+    background-color:floralwhite;
 }
 
-.progReqsList {
-    float:right;
+.progOpsList, .progReqsList {
+    display:inline-block;
+    border:1px dotted red;
+    list-style-type:circle;
+    width:250px;
+    height:auto;
+    margin:10px;
 }
+
+.editable {
+    color:orange;
+    font-style: oblique;
+    text-underline: dash-long-heavy;
+}
+
+.editable:hover {
+    background-color: crimson;
+}
+
+/* ---------------------------------------- */
+/* FORM ELEMENTS STYLING */
+/* ---------------------------------------- */
 .expreq {
     visibility: hidden;
 }
@@ -58,35 +186,53 @@ td {
 #schoolForm {
     visibility: hidden;
     float:right;
-    width:40%;
+    width:10%;
 }
 
-.opSection {
-    border:1px solid darkgreen;
-    border-radius:5px;
-    width:250px;
-    background-color:lightgray;
-    clear:both;
+fieldset {
+    border:ridge 2px darkslategray;
 }
 
-.reqSection {
-    border:1px solid darkblue;
-    border-radius:5px;
-    width:250px;
-    background-color:lightgray;
-    clear:both;
+#progOps, #links, #progReqs {
+    align-content: space-between;
+    background-color: darkgray;
+    padding: 0;
+    margin: 0;
 }
 
-.linkSection {
-    border:1px solid orangered;
-    border-radius:5px;
-    width:inherit;
-    background-color:lightgray;
-    clear:both;
+.opSection, .reqSection, .linkSection {
+    border:1px solid black;
+    margin:10px 0 10px 8px;
 }
 
-.editable {
-    color:orange;
-    font-style: oblique;
-    text-underline: dash-long-heavy;
+input[type='text']:not(.linkDisplayName) {
+    width:75%;
+    padding:5px 15px;
+    margin:10px 0;
+    box-sizing: border-box;
+    border-radius: 6px;
+}
+
+.linkDisplayName {
+    width:15%;
+}
+
+input[type='number'] {
+    width:10%;
+    padding:5px 15px;
+    margin:10px 0;
+    box-sizing: border-box;
+    border-radius: 6px;
+}
+
+select:not(#degree) {
+    width:75%;
+    padding:5px 15px;
+    border:none;
+    border-radius:6px;
+    background-color: aliceblue;
+}
+
+input[type='url'] {
+    width:90%;
 }

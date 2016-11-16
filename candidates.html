@@ -8,8 +8,10 @@
     <title>Graduate School Candidate List</title>
 </head>
 <body>
-    <h1> Graduate School Candidates </h1>
+    <h1> Graduate School Candidate Tracking Site </h1>
+    <i><b>Made with love, just for you! :)</b></i>
     <hr>
+    <i>**Click on 'Details' for a guide/tutorial/definitions built right into this page.</i><br>
     <details title="Instructions and Details">
         <def>Requirement Parameter: IF...
             <ul>
@@ -22,13 +24,12 @@
         <b>To edit or delete an existing school, double-click its "School Name" in the appropriate cell of the first column.</b>
     </details>
     <br><br>
-    <fieldset class="buttonSet">
-        <button id="btnAddSchool">Add New School Candidate</button>
-        <button id="btnDeleteAll">Delete All School Candidates</button>
-    </fieldset>
+    <button class="btn" id="btnAddSchool">Add New School Candidate</button>
+    <button class="btn" id="btnDeleteAll">Delete All School Candidates</button>
     <br><br>
     <div id="content">
         <table id="schoolTable">
+            <caption>Candidates Table</caption>
             <tr class="headerRow">
                 <td>School Name</td>
                 <td>State</td>
@@ -79,7 +80,8 @@
                 <br><br>
                 <fieldset>
                     <legend>Program Cost</legend>
-                    <i>Only 1 needs to be entered, the rest will be calculated.</i>
+                    <i>*Only 1 needs to be entered, the rest will be calculated.*</i>
+                    <br>
                     <div id="costDiv">
                         <label for="costPerCred">Per Credit: </label><input id="costPerCred" type="number" step="any">
                         <br><br>
@@ -91,6 +93,7 @@
                 <br><br>
                 <fieldset id="progOps">
                     <legend>Program Options (Specializations & Concentrations):</legend>
+                    <br><br>
                     <div class="opSection" id="opRoot">
                         <label>Option Type:</label>
                         <select class="opType">
@@ -103,14 +106,12 @@
                     </div>
                 </fieldset>
                 <br><br>
-                <fieldset class="buttonSet">
-                    <button id="btnAddOp">Add Program Option</button>
-                    <button id="btnRemoveOp">Remove Last Program Option</button>
-                </fieldset>
+                <button class="btn" id="btnAddOp">Add Program Option</button>
+                <button class="btn" id="btnRemoveOp">Remove Last Program Option</button>
                 <br><br>
                 <fieldset id="progReqs">
                     <legend>Program Requirements for Acceptance</legend>
-                    <br>
+                    <br><br>
                     <div class="reqSection" id="reqRoot">
                         <label>Requirement Group:</label>
                         <select class="reqGroup">
@@ -143,10 +144,8 @@
                     </div>
                 </fieldset>
                 <br><br>
-                <fieldset class="buttonSet">
-                    <button id="btnAddReq">Add Requirement</button>
-                    <button id="btnRemoveReq">Remove Last Requirement</button>
-                </fieldset>
+                <button class="btn" id="btnAddReq">Add Requirement</button>
+                <button class="btn" id="btnRemoveReq">Remove Last Requirement</button>
             </fieldset>
             <br><br>
             <fieldset id="links">
@@ -160,20 +159,18 @@
                 </div>
             </fieldset>
             <br><br>
-            <fieldset class="buttonSet">
-                <button id="btnAddSchoolLink">Add Link</button>
-                <button id="btnRemoveSchoolLink">Remove Last Link</button>
-            </fieldset>
+            <button class="btn" id="btnAddSchoolLink">Add Link</button>
+            <button class="btn" id="btnRemoveSchoolLink">Remove Last Link</button>
+            <br><br>
             <fieldset>
                 <legend>Extra Notes</legend>
-                <label for="schoolNotes">Additional Notes</label>
+                <label for="schoolNotes">Additional Notes <i>(Optional)</i></label>
+                <br><br>
                 <textarea id="schoolNotes"></textarea>
             </fieldset>
-            <fieldset class="buttonSet">
-                <button id="btnSave">Save</button>
-                <button id="btnCancel">Cancel</button>
-                <button id="btnDelete">Delete</button>
-            </fieldset>
+            <button class="btn" id="btnSave">Save</button>
+            <button class="btn" id="btnCancel">Cancel</button>
+            <button class="btn" id="btnDelete">Delete</button>
         </div>
     </div>
     <br><br>

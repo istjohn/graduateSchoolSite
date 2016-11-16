@@ -40,8 +40,8 @@ $(document).ready(function() {
         //add new school
         $("#btnAddSchool").on("click", function() {
             console.log("Pressed the add school button...");
-            $("#schoolTable").css('width','25%');
-            $("#schoolForm").css('width','75%');
+            $("#schoolTable").css('width','10%');
+            $("#schoolForm").css('width','90%');
             $("#schoolForm").css('visibility','visible');
         });
 
@@ -66,8 +66,8 @@ $(document).ready(function() {
 
             console.log("Opening form to edit object:\n"+JSON.stringify(candidate));
             //show the form and collapse the table
-            $("#schoolTable").css('width','25%');
-            $("#schoolForm").css('width','75%');
+            $("#schoolTable").css('width','10%');
+            $("#schoolForm").css('width','90%');
             $("#schoolForm").css('visibility','visible');
 
             //tell the school to populate the visible form with its data
@@ -97,7 +97,7 @@ $(document).ready(function() {
             var orig = $("#reqRoot");
             var clone = orig.clone();
             clone.removeProp('id');
-            orig.append($("<br>"));
+            console.log("class?  " + clone.prop('class'));
             $("#progReqs").append(clone);
         });
 
@@ -112,7 +112,6 @@ $(document).ready(function() {
             var orig = $("#opRoot");
             var clone = orig.clone();
             clone.removeProp('id');
-            orig.append($("<br>"));
             $("#progOps").append(clone);
         });
         //remove op
@@ -126,8 +125,7 @@ $(document).ready(function() {
             var orig = $("#linkRoot");
             var clone = orig.clone();
             clone.removeProp('id');
-            orig.append($("<br>"));
-            $("#links").after()
+            $("#links").append(clone);
         });
 
         //remove school link
@@ -136,7 +134,7 @@ $(document).ready(function() {
         });
 
         //update available req types based on selected req group
-        $(".reqSection").on("change", ".reqGroup", function() {
+        $("#progReqs").on("change", ".reqGroup", function() {
             var reqGroup = $(this);
             console.log("Selected requirement group set to: " + reqGroup.val());
             var reqType = reqGroup.next(".reqType");
@@ -299,7 +297,9 @@ $(document).ready(function() {
 
 
                 $("#schoolTable").append($("<tr>")
-                    .append($("<td class='editable'>").text(candidate.schoolName))
+                    .append($("<td class='editable'>")
+                        .append()
+                        .text(candidate.schoolName))
                     .append($("<td>").text(candidate.schoolState))
                     .append($("<td>").text(candidate.appDueDate))
                     .append($("<td>").text(candidate.appFee))
@@ -348,8 +348,8 @@ $(document).ready(function() {
         $(".reqSection").not(":first").remove();
         $(".linkSection").not(":first").remove();
         $("#schoolNotes").val("");
-        $("#schoolForm").css('width','25%');
-        $("#schoolTable").css('width','75%');
+        $("#schoolForm").css('width','10%');
+        $("#schoolTable").css('width','90%');
         location.reload();
     }
 
