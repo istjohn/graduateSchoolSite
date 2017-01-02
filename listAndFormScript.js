@@ -97,6 +97,10 @@ $(document).ready(function() {
             var orig = $("#reqRoot");
             var clone = orig.clone();
             clone.removeProp('id');
+            clone.children('.reqGroup').val("");
+            clone.children('.reqType').val("");
+            clone.children('.reqParam').val(0);
+            clone.children('.reqNotes').val("");
             console.log("class?  " + clone.prop('class'));
             $("#progReqs").append(clone);
         });
@@ -112,6 +116,9 @@ $(document).ready(function() {
             var orig = $("#opRoot");
             var clone = orig.clone();
             clone.removeProp('id');
+            clone.children('.opType').val('Concentration');
+            clone.children('.opName').val('');
+            clone.children('.opNotes').val('');
             $("#progOps").append(clone);
         });
         //remove op
@@ -125,6 +132,8 @@ $(document).ready(function() {
             var orig = $("#linkRoot");
             var clone = orig.clone();
             clone.removeProp('id');
+            clone.children('.linkDisplayName').val("");
+            clone.children('.linkUrl').val("");
             $("#links").append(clone);
         });
 
@@ -143,19 +152,19 @@ $(document).ready(function() {
                 $(".reqType option[class='expreq']").css('visibility','hidden');
                 $(".reqType option[class='genreq']").css('visibility','hidden');
                 $(".reqType option[class='docreq']").css('visibility','visible');
-                reqType.val("Personal Statement");
+                $(".reqType option[value='Personal Statement']").prop('selected', true);
             } else if(reqGroup.val() == "Experience Requirement") {
                 console.log("Hide doc reqs and gen reqs");
                 $(".reqType option[class='docreq']").css('visibility','hidden');
                 $(".reqType option[class='expreq']").css('visibility','visible');
                 $(".reqType option[class='genreq']").css('visibility','hidden');
-                reqType.val("Volunteer Experience");
+                $(".reqType option[value='Work Experience']").prop('selected', true);
             } else {
                 console.log("Hide doc reqs and exp reqs");
                 $(".reqType option[class='docreq']").css('visibility','hidden');
                 $(".reqType option[class='expreq']").css('visibility','hidden');
                 $(".reqType option[class='genreq']").css('visibility','visible');
-                reqType.val("Minimum GPA");
+                $(".reqType option[value='Minimum GPA']").prop('selected', true);
             }
         });
 
@@ -314,7 +323,7 @@ $(document).ready(function() {
                     .append($("<td class='editable'>").text(candidate.schoolName))
                     .append($("<td>").text(candidate.schoolState))
                     .append($("<td>").text(candidate.appDueDate))
-                    .append($("<td>").text(candidate.appFee))
+                    .append($("<td>").text("$"+candidate.appFee))
                     .append($("<td>")
                         .append($("<details>")
                             .append($("<summary>").text("Degree:"+prog.degree))
@@ -365,6 +374,7 @@ $(document).ready(function() {
         $("#schoolForm").css('width','10%');
         $("#schoolTable").css('width','90%');
         location.reload();
+        $('html, body').animate({ scrollTop: 0 }, 0);
     }
 
     /**

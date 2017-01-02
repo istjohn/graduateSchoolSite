@@ -41,7 +41,7 @@
             </tr>
         </table>
         <div id="schoolForm">
-            <fieldset>
+            <fieldset id="formBase">
                 <legend>School Information</legend>
                 <label for="schoolName">School Name:</label>
                 <input id="schoolName" type="text"><br>
@@ -63,7 +63,7 @@
                 <br><br>
             </fieldset>
             <br><br>
-            <fieldset>
+            <fieldset id="progBase">
                 <legend>Program Information</legend>
                 <label for="degree">Degree:</label>
                 <select id="degree">
@@ -104,7 +104,7 @@
                         <label>Option Name:</label>
                         <input class="opName" type="text">
                         <br><br>
-                        <label>Option Notes:</label>
+                        <label>Option Notes:</label><br>
                         <textarea class="opNotes"></textarea>
                         <br>
                     </div>
@@ -145,7 +145,7 @@
                         <label>Requirement Parameter:</label>
                         <input class="reqParam" type="number" step="any">
                         <br><br>
-                        <label>Requirement Notes:</label>
+                        <label>Requirement Notes:</label><br>
                         <textarea class="reqNotes"></textarea>
                     </div>
                 </fieldset>
@@ -154,26 +154,31 @@
                 <button class="btn" id="btnRemoveReq">Remove Last Requirement</button>
             </fieldset>
             <br><br>
-            <fieldset id="links">
-                <legend>School Links</legend>
-                <div class="linkSection" id="linkRoot">
-                    <label>Link Display Name: <i>(What will be displayed in the table)</i></label>
-                    <input type="text" class="linkDisplayName">
-                    <br><br>
-                    <label>URL: <i>Copy & Paste the Page you want to use later</i></label>
-                    <input type="url" class="linkUrl">
-                </div>
-            </fieldset>
-            <br><br>
-            <button class="btn" id="btnAddSchoolLink">Add Link</button>
-            <button class="btn" id="btnRemoveSchoolLink">Remove Last Link</button>
-            <br><br>
             <fieldset>
-                <legend>Extra Notes</legend>
-                <label for="schoolNotes">Additional Notes <i>(Optional)</i></label>
+                <legend>Extra Information for School</legend>
+                <fieldset id="links">
+                    <legend>School Links</legend>
+                    <div class="linkSection" id="linkRoot">
+                        <label>Link Display Name: <i>(What will be displayed in the table)</i></label>
+                        <input type="text" class="linkDisplayName">
+                        <br><br>
+                        <label>URL: <i>Copy & Paste the Page you want to use later</i></label>
+                        <input type="url" class="linkUrl">
+                    </div>
+                </fieldset>
                 <br><br>
-                <textarea id="schoolNotes"></textarea>
+                <button class="btn" id="btnAddSchoolLink">Add Link</button>
+                <button class="btn" id="btnRemoveSchoolLink">Remove Last Link</button>
+                <br><br>
+                <fieldset>
+                    <legend>Extra Notes</legend>
+                    <label for="schoolNotes">Additional Notes <i>(Optional)</i></label>
+                    <br><br>
+                    <textarea id="schoolNotes"></textarea>
+                </fieldset>
+                <br><br>
             </fieldset>
+            <br><br>
             <button class="btn" id="btnSave">Save</button>
             <button class="btn" id="btnCancel">Cancel</button>
             <button class="btn" id="btnDelete">Delete</button>
