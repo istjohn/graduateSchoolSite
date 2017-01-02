@@ -8,6 +8,11 @@ h1 {
     color:rebeccapurple;
 }
 
+label {
+    font-weight: bolder;
+    color:darkviolet;
+}
+
 /*h1:h*/
 
 .btn {
@@ -117,7 +122,7 @@ a:active {
 .headerRow {
     display:table-row;
     text-align:center;
-    font-size:12pt;
+    font-size:14pt;
     text-underline:single;
     border:solid 1px black;
     background-color:darkgray;
@@ -135,6 +140,8 @@ td {
     border:solid 1px black;
     margin:20px 20px;
     text-align:center;
+    font-family: Georgia, serif;
+    font-size:12pt;
 }
 
 #schoolTable {
@@ -152,21 +159,28 @@ td {
 
 .progOpsList, .progReqsList {
     display:inline-block;
-    border:1px dotted red;
     list-style-type:circle;
     width:250px;
     height:auto;
     margin:10px;
 }
 
+.progOpsList {
+    border:2px dotted deepskyblue;
+}
+
+.progReqsList {
+    border:2px dotted limegreen;
+}
+
 .editable {
-    color:orange;
+    color:springgreen;
     font-style: oblique;
     text-underline: dash-long-heavy;
 }
 
 .editable:hover {
-    background-color: crimson;
+    background-color: darkmagenta;
 }
 
 /* ---------------------------------------- */
@@ -191,13 +205,18 @@ td {
 
 fieldset {
     border:ridge 2px darkslategray;
-}
-
-#progOps, #links, #progReqs {
     align-content: space-between;
     background-color: darkgray;
     padding: 0;
     margin: 0;
+}
+
+#formBase {
+    background-color:lightgray;
+}
+
+#progBase {
+    background-color:whitesmoke;
 }
 
 .opSection, .reqSection, .linkSection {
@@ -218,7 +237,7 @@ input[type='text']:not(.linkDisplayName) {
 }
 
 input[type='number'] {
-    width:10%;
+    width:25%;
     padding:5px 15px;
     margin:10px 0;
     box-sizing: border-box;
