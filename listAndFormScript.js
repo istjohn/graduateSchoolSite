@@ -165,7 +165,8 @@ $(document).ready(function() {
             $(".opSection").each(function() {
                 var otype = $(this).children(".opType").val();
                 var oname = $(this).children(".opName").val();
-                ops.push(new ProgOp(otype, oname));
+                var opNotes = $(this).children(".opNotes").val();
+                ops.push(new ProgOp(otype, oname, opNotes));
             });
 
             var reqs = [];
@@ -173,7 +174,8 @@ $(document).ready(function() {
                 var g = $(this).children(".reqGroup").val();
                 var t = $(this).children(".reqType").val();
                 var p = $(this).children(".reqParam").val();
-                reqs.push(new ProgReq(g, t, p));
+                var n = $(this).children(".reqNotes").val();
+                reqs.push(new ProgReq(g, t, p, n));
             });
 
             var links = [];
@@ -229,13 +231,21 @@ $(document).ready(function() {
             var rawops = rawprog['progOps'];
             var ops = [];
             $.each(rawops, function(ind, rawop){
-                ops.push(new ProgOp(rawop['opType'],rawop['opName']));
+                var notes = "";
+                if(rawop['opNotes'] != undefined) {
+                    notes = rawop['opNotes'];
+                }
+                ops.push(new ProgOp(rawop['opType'],rawop['opName'],notes));
             });
 
             var rawreqs = rawprog['progReqs'];
             var reqs = [];
             $.each(rawreqs, function(ind, rawreq){
-                reqs.push(new ProgReq(rawreq['reqGroup'],rawreq['reqType'],rawreq['reqParam']));
+                var notes = "";
+                if(rawreq['reqNotes'] != undefined) {
+                    notes = rawreq['reqNotes'];
+                }
+                reqs.push(new ProgReq(rawreq['reqGroup'],rawreq['reqType'],rawreq['reqParam'],notes));
             });
 
             var rawlinks = jsonObj['schoolLinks'];
@@ -273,12 +283,16 @@ $(document).ready(function() {
                 var prog = candidate.prog;
                 var ops = $("<ul class='progOpsList'>");
                 $.each(prog.progOps, function(ind, op) {
-                    ops.append($("<li>").text(op.opType + " : " + op.opName));
+                    ops.append($("<li>").text(op.opType + " : " + op.opName)
+                        .append($("<p>").text("Notes:\n" + op.opNotes))
+                    );
                 });
 
                 var reqs = $("<ul class='progReqsList'>");
                 $.each(prog.progReqs, function(ind, req) {
-                    reqs.append($("<li>").text("["+req.reqGroup+"] : "+req.reqParam + " " + req.reqType));
+                    reqs.append($("<li>").text("["+req.reqGroup+"] : "+req.reqParam + " " + req.reqType)
+                        .append($("<p>").text("Notes:\n" + req.reqNotes))
+                    );
                 });
 
                 var links = $("<ul class='schoolLinkList'>");
@@ -338,8 +352,10 @@ $(document).ready(function() {
         $("#costPerYear").val("");
         $(".reqGroup").val("Document Requirement");
         $(".reqType").val("Personal Statement");
+        $(".reqNotes").val("");
         $(".opType").val("Concentration");
         $(".opName").val("");
+        $(".opNotes").val("");
         $("#degree").val("MSW");
         $("#progLen").val("");
         $(".opSection").not(":first").remove();
@@ -350,6 +366,11 @@ $(document).ready(function() {
         $("#schoolTable").css('width','90%');
         location.reload();
     }
+
+    /**
+     * Created by Iain on 1/1/2017.
+     * Contains the objects
+     */
 
     /** GraduateSchool candidate object constructor
      * params: school's name, state it's in, application due date and fee, and the program of interest*/
@@ -442,6 +463,7 @@ $(document).ready(function() {
                     root.children(".reqGroup").val(req.reqGroup);
                     root.children(".reqType").val(req.reqType);
                     root.children(".reqParam").val(req.reqParam);
+                    root.children(".reqNotes").val(req.reqNotes);
                 }
             });
 
@@ -452,15 +474,17 @@ $(document).ready(function() {
                     var root = $("#opRoot");
                     root.children(".opType").val(op.opType);
                     root.children(".opName").val(op.opName);
+                    root.children(".opNotes").val(op.opNotes);
                 }
             });
         };
     }
 
     /** Program Option constructor i.e: Specializations & Concentrations. Given the type and the name*/
-    function ProgOp(opType, opName) {
+    function ProgOp(opType, opName, opNotes) {
         this.opType = opType;
         this.opName = opName;
+        this.opNotes = opNotes;
         this.populateProgOpFormData = function () {
             var root = $("#opRoot");
             var clone = root.clone();
@@ -468,14 +492,16 @@ $(document).ready(function() {
             $("#progOps").append(clone);
             clone.children(".opType").val(this.opType);
             clone.children(".opName").val(this.opName);
+            clone.children(".opNotes").val(this.opNotes);
         };
     }
 
     /** Program Requirement constructor (Doc Req, Exp Req, Gen Req). Given the type, the name */
-    function ProgReq(reqGroup, reqType, reqParam) {
+    function ProgReq(reqGroup, reqType, reqParam, reqNotes) {
         this.reqGroup = reqGroup;
         this.reqType = reqType;
         this.reqParam = reqParam;
+        this.reqNotes = reqNotes;
         this.populateProgReqFormData = function() {
             var root = $("#reqRoot");
             var clone = root.clone();
@@ -484,22 +510,23 @@ $(document).ready(function() {
             clone.children(".reqGroup").val(this.reqGroup);
             clone.children(".reqType").val(this.reqType);
             clone.children(".reqParam").val(this.reqParam);
+            clone.children(".reqNotes").val(this.reqNotes);
 
             if(this.reqGroup == "Document Requirement") {
                 $(".reqType option[class='expreq']").css('visibility','hidden');
                 $(".reqType option[class='genreq']").css('visibility','hidden');
                 $(".reqType option[class='docreq']").css('visibility','visible');
-                reqType.val("Personal Statement");
+                $(".reqType").val("Personal Statement");
             } else if(this.reqGroup == "Experience Requirement") {
                 $(".reqType option[class='docreq']").css('visibility','hidden');
                 $(".reqType option[class='expreq']").css('visibility','visible');
                 $(".reqType option[class='genreq']").css('visibility','hidden');
-                reqType.val("Volunteer Experience");
+                $(".reqType").val("Volunteer Experience");
             } else {
                 $(".reqType option[class='docreq']").css('visibility','hidden');
                 $(".reqType option[class='expreq']").css('visibility','hidden');
                 $(".reqType option[class='genreq']").css('visibility','visible');
-                reqType.val("Minimum GPA");
+                $(".reqType").val("Minimum GPA");
             }
         };
     }
